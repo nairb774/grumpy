@@ -106,7 +106,7 @@ func (s *delAttrSlot) makeCallable(t *Type, slotName string) *Object {
 		if raised := s.Fn(f, args[0], toStrUnsafe(args[1])); raised != nil {
 			return nil, raised
 		}
-		return None, nil
+		return &None, nil
 	}).ToObject()
 }
 
@@ -130,7 +130,7 @@ func (s *deleteSlot) makeCallable(t *Type, slotName string) *Object {
 		if raised := s.Fn(f, args[0], args[1]); raised != nil {
 			return nil, raised
 		}
-		return None, nil
+		return &None, nil
 	}).ToObject()
 }
 
@@ -154,7 +154,7 @@ func (s *delItemSlot) makeCallable(t *Type, slotName string) *Object {
 		if raised := s.Fn(f, args[0], args[1]); raised != nil {
 			return nil, raised
 		}
-		return None, nil
+		return &None, nil
 	}).ToObject()
 }
 
@@ -281,7 +281,7 @@ func (s *setAttrSlot) makeCallable(t *Type, slotName string) *Object {
 		if raised := s.Fn(f, args[0], toStrUnsafe(args[1]), args[2]); raised != nil {
 			return nil, raised
 		}
-		return None, nil
+		return &None, nil
 	}).ToObject()
 }
 
@@ -305,7 +305,7 @@ func (s *setItemSlot) makeCallable(t *Type, slotName string) *Object {
 		if raised := s.Fn(f, args[0], args[1], args[2]); raised != nil {
 			return nil, raised
 		}
-		return None, nil
+		return &None, nil
 	}).ToObject()
 }
 
@@ -329,7 +329,7 @@ func (s *setSlot) makeCallable(t *Type, slotName string) *Object {
 		if raised := s.Fn(f, args[0], args[1], args[2]); raised != nil {
 			return nil, raised
 		}
-		return None, nil
+		return &None, nil
 	}).ToObject()
 }
 

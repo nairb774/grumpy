@@ -48,7 +48,7 @@ func TestFunctionGet(t *testing.T) {
 
 func TestFunctionName(t *testing.T) {
 	fun := newBuiltinFunction("TestFunctionName", func(f *Frame, _ Args, _ KWArgs) (*Object, *BaseException) {
-		foo := newBuiltinFunction("foo", func(*Frame, Args, KWArgs) (*Object, *BaseException) { return None, nil })
+		foo := newBuiltinFunction("foo", func(*Frame, Args, KWArgs) (*Object, *BaseException) { return &None, nil })
 		return GetAttr(f, foo.ToObject(), NewStr("__name__"), nil)
 	}).ToObject()
 	if err := runInvokeTestCase(fun, &invokeTestCase{want: NewStr("foo").ToObject()}); err != "" {
@@ -84,7 +84,7 @@ func TestFunctionStrRepr(t *testing.T) {
 			}
 			return nil
 		})
-		if err := runInvokeTestCase(fun, &invokeTestCase{want: None}); err != "" {
+		if err := runInvokeTestCase(fun, &invokeTestCase{want: &None}); err != "" {
 			t.Error(err)
 		}
 	}

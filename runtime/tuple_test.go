@@ -39,17 +39,17 @@ func TestTupleBinaryOps(t *testing.T) {
 	})
 	cases := []invokeTestCase{
 		{args: wrapArgs(Add, newTestTuple(3), newTestTuple("foo")), want: newTestTuple(3, "foo").ToObject()},
-		{args: wrapArgs(Add, NewTuple(None), NewTuple()), want: NewTuple(None).ToObject()},
+		{args: wrapArgs(Add, NewTuple(&None), NewTuple()), want: NewTuple(&None).ToObject()},
 		{args: wrapArgs(Add, NewTuple(), newObject(ObjectType)), wantExc: mustCreateException(TypeErrorType, "unsupported operand type(s) for +: 'tuple' and 'object'")},
-		{args: wrapArgs(Add, None, NewTuple()), wantExc: mustCreateException(TypeErrorType, "unsupported operand type(s) for +: 'NoneType' and 'tuple'")},
+		{args: wrapArgs(Add, &None, NewTuple()), wantExc: mustCreateException(TypeErrorType, "unsupported operand type(s) for +: 'NoneType' and 'tuple'")},
 		{args: wrapArgs(Mul, NewTuple(), 10), want: NewTuple().ToObject()},
 		{args: wrapArgs(Mul, newTestTuple("baz"), -2), want: NewTuple().ToObject()},
-		{args: wrapArgs(Mul, newTestTuple(None, None), 0), want: NewTuple().ToObject()},
+		{args: wrapArgs(Mul, newTestTuple(&None, &None), 0), want: NewTuple().ToObject()},
 		{args: wrapArgs(Mul, newTestTuple(1, "bar"), 2), want: newTestTuple(1, "bar", 1, "bar").ToObject()},
 		{args: wrapArgs(Mul, 1, newTestTuple(1, "bar")), want: newTestTuple(1, "bar").ToObject()},
 		{args: wrapArgs(Mul, newObject(ObjectType), newTestTuple(newObject(ObjectType))), wantExc: mustCreateException(TypeErrorType, "unsupported operand type(s) for *: 'object' and 'tuple'")},
 		{args: wrapArgs(Mul, NewTuple(newObject(ObjectType)), NewTuple()), wantExc: mustCreateException(TypeErrorType, "unsupported operand type(s) for *: 'tuple' and 'tuple'")},
-		{args: wrapArgs(Mul, NewTuple(None, None), MaxInt), wantExc: mustCreateException(OverflowErrorType, "result too large")},
+		{args: wrapArgs(Mul, NewTuple(&None, &None), MaxInt), wantExc: mustCreateException(OverflowErrorType, "result too large")},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(fun, &cas); err != "" {
@@ -89,11 +89,11 @@ func TestTupleContains(t *testing.T) {
 		{args: wrapArgs(newTestTuple("foo", 42, "bar"), 42), want: True.ToObject()},
 		{args: wrapArgs(newTestTuple("foo", 42, "bar"), "bar"), want: True.ToObject()},
 		{args: wrapArgs(NewTuple(), newTestSlice(50, 100)), want: False.ToObject()},
-		{args: wrapArgs(newTestTuple(1, 2, 3, 4, 5), newTestSlice(1, None, 2)), want: False.ToObject()},
+		{args: wrapArgs(newTestTuple(1, 2, 3, 4, 5), newTestSlice(1, &None, 2)), want: False.ToObject()},
 		{args: wrapArgs(NewTuple(), 1), want: False.ToObject()},
 		{args: wrapArgs(newTestTuple(32), -100), want: False.ToObject()},
-		{args: wrapArgs(newTestTuple(1, 2, 3), newTestSlice(1, None, 0)), want: False.ToObject()},
-		{args: wrapArgs(newTestTuple(true), None), want: False.ToObject()},
+		{args: wrapArgs(newTestTuple(1, 2, 3), newTestSlice(1, &None, 0)), want: False.ToObject()},
+		{args: wrapArgs(newTestTuple(true), &None), want: False.ToObject()},
 	}
 	for _, cas := range cases {
 		if err := runInvokeMethodTestCase(TupleType, "__contains__", &cas); err != "" {
@@ -159,11 +159,11 @@ func TestTupleGetItem(t *testing.T) {
 		{args: wrapArgs(newTestTuple("foo", 42, "bar"), 1), want: NewInt(42).ToObject()},
 		{args: wrapArgs(newTestTuple("foo", 42, "bar"), -3), want: NewStr("foo").ToObject()},
 		{args: wrapArgs(NewTuple(), newTestSlice(50, 100)), want: NewTuple().ToObject()},
-		{args: wrapArgs(newTestTuple(1, 2, 3, 4, 5), newTestSlice(1, None, 2)), want: newTestTuple(2, 4).ToObject()},
+		{args: wrapArgs(newTestTuple(1, 2, 3, 4, 5), newTestSlice(1, &None, 2)), want: newTestTuple(2, 4).ToObject()},
 		{args: wrapArgs(NewTuple(), 1), wantExc: mustCreateException(IndexErrorType, "index out of range")},
 		{args: wrapArgs(newTestTuple(32), -100), wantExc: mustCreateException(IndexErrorType, "index out of range")},
-		{args: wrapArgs(newTestTuple(1, 2, 3), newTestSlice(1, None, 0)), wantExc: mustCreateException(ValueErrorType, "slice step cannot be zero")},
-		{args: wrapArgs(newTestTuple(true), None), wantExc: mustCreateException(TypeErrorType, "sequence indices must be integers, not NoneType")},
+		{args: wrapArgs(newTestTuple(1, 2, 3), newTestSlice(1, &None, 0)), wantExc: mustCreateException(ValueErrorType, "slice step cannot be zero")},
+		{args: wrapArgs(newTestTuple(true), &None), wantExc: mustCreateException(TypeErrorType, "sequence indices must be integers, not NoneType")},
 	}
 	for _, cas := range cases {
 		if err := runInvokeMethodTestCase(TupleType, "__getitem__", &cas); err != "" {
@@ -183,7 +183,7 @@ func TestTupleNew(t *testing.T) {
 	cases := []invokeTestCase{
 		{want: NewTuple().ToObject()},
 		{args: wrapArgs(newTestTuple(1, 2, 3)), want: newTestTuple(1, 2, 3).ToObject()},
-		{args: wrapArgs(newTestDict(1, "foo", "bar", None)), want: newTestTuple(1, "bar").ToObject()},
+		{args: wrapArgs(newTestDict(1, "foo", "bar", &None)), want: newTestTuple(1, "bar").ToObject()},
 		{args: wrapArgs(42), wantExc: mustCreateException(TypeErrorType, "'int' object is not iterable")},
 	}
 	for _, cas := range cases {

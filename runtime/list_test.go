@@ -42,17 +42,17 @@ func TestListBinaryOps(t *testing.T) {
 		wantExc *BaseException
 	}{
 		{Add, newTestList(3).ToObject(), newTestList("foo").ToObject(), newTestList(3, "foo").ToObject(), nil},
-		{Add, NewList(None).ToObject(), NewList().ToObject(), NewList(None).ToObject(), nil},
+		{Add, NewList(&None).ToObject(), NewList().ToObject(), NewList(&None).ToObject(), nil},
 		{Add, NewList().ToObject(), newObject(ObjectType), nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for +: 'list' and 'object'")},
-		{Add, None, NewList().ToObject(), nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for +: 'NoneType' and 'list'")},
+		{Add, &None, NewList().ToObject(), nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for +: 'NoneType' and 'list'")},
 		{Mul, NewList().ToObject(), NewInt(10).ToObject(), NewList().ToObject(), nil},
 		{Mul, newTestList("baz").ToObject(), NewInt(-2).ToObject(), NewList().ToObject(), nil},
-		{Mul, NewList(None, None).ToObject(), NewInt(0).ToObject(), NewList().ToObject(), nil},
+		{Mul, NewList(&None, &None).ToObject(), NewInt(0).ToObject(), NewList().ToObject(), nil},
 		{Mul, newTestList(1, "bar").ToObject(), NewInt(2).ToObject(), newTestList(1, "bar", 1, "bar").ToObject(), nil},
 		{Mul, NewInt(1).ToObject(), newTestList(1, "bar").ToObject(), newTestList(1, "bar").ToObject(), nil},
 		{Mul, newObject(ObjectType), NewList(newObject(ObjectType)).ToObject(), nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for *: 'object' and 'list'")},
 		{Mul, NewList(newObject(ObjectType)).ToObject(), NewList().ToObject(), nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for *: 'list' and 'list'")},
-		{Mul, NewList(None, None).ToObject(), NewInt(MaxInt).ToObject(), nil, mustCreateException(OverflowErrorType, "result too large")},
+		{Mul, NewList(&None, &None).ToObject(), NewInt(MaxInt).ToObject(), nil, mustCreateException(OverflowErrorType, "result too large")},
 	}
 	for _, cas := range cases {
 		testCase := invokeTestCase{args: wrapArgs(cas.v, cas.w), want: cas.want, wantExc: cas.wantExc}
@@ -137,14 +137,14 @@ func TestListGetItem(t *testing.T) {
 		{args: wrapArgs(newTestRange(20), 19), want: NewInt(19).ToObject()},
 		{args: wrapArgs(NewList(), 101), wantExc: mustCreateException(IndexErrorType, "index out of range")},
 		{args: wrapArgs(NewList(), newTestSlice(50, 100)), want: NewList().ToObject()},
-		{args: wrapArgs(newTestList(1, 2, 3, 4, 5), newTestSlice(1, 3, None)), want: newTestList(2, 3).ToObject()},
-		{args: wrapArgs(newTestList(1, 2, 3, 4, 5), newTestSlice(1, None, 2)), want: newTestList(2, 4).ToObject()},
-		{args: wrapArgs(newTestList(1, 2, 3, 4, 5), newTestSlice(big.NewInt(1), None, 2)), want: newTestList(2, 4).ToObject()},
+		{args: wrapArgs(newTestList(1, 2, 3, 4, 5), newTestSlice(1, 3, &None)), want: newTestList(2, 3).ToObject()},
+		{args: wrapArgs(newTestList(1, 2, 3, 4, 5), newTestSlice(1, &None, 2)), want: newTestList(2, 4).ToObject()},
+		{args: wrapArgs(newTestList(1, 2, 3, 4, 5), newTestSlice(big.NewInt(1), &None, 2)), want: newTestList(2, 4).ToObject()},
 		{args: wrapArgs(newTestList(1, 2, 3, 4, 5), newTestSlice(1, big.NewInt(5), 2)), want: newTestList(2, 4).ToObject()},
-		{args: wrapArgs(newTestList(1, 2, 3, 4, 5), newTestSlice(1, None, big.NewInt(2))), want: newTestList(2, 4).ToObject()},
-		{args: wrapArgs(newTestList(1, 2, 3, 4, 5), newTestSlice(1.0, 3, None)), wantExc: mustCreateException(TypeErrorType, errBadSliceIndex)},
-		{args: wrapArgs(newTestList(1, 2, 3), newTestSlice(1, None, 0)), wantExc: mustCreateException(ValueErrorType, "slice step cannot be zero")},
-		{args: wrapArgs(newTestList(true), None), wantExc: mustCreateException(TypeErrorType, "list indices must be integers, not NoneType")},
+		{args: wrapArgs(newTestList(1, 2, 3, 4, 5), newTestSlice(1, &None, big.NewInt(2))), want: newTestList(2, 4).ToObject()},
+		{args: wrapArgs(newTestList(1, 2, 3, 4, 5), newTestSlice(1.0, 3, &None)), wantExc: mustCreateException(TypeErrorType, errBadSliceIndex)},
+		{args: wrapArgs(newTestList(1, 2, 3), newTestSlice(1, &None, 0)), wantExc: mustCreateException(ValueErrorType, "slice step cannot be zero")},
+		{args: wrapArgs(newTestList(true), &None), wantExc: mustCreateException(TypeErrorType, "list indices must be integers, not NoneType")},
 	}
 	for _, cas := range cases {
 		if err := runInvokeMethodTestCase(ListType, "__getitem__", &cas); err != "" {
@@ -161,11 +161,11 @@ func TestListInplaceOps(t *testing.T) {
 		wantExc *BaseException
 	}{
 		{IAdd, newTestList(3).ToObject(), newTestList("foo").ToObject(), newTestList(3, "foo").ToObject(), nil},
-		{IAdd, NewList(None).ToObject(), NewList().ToObject(), NewList(None).ToObject(), nil},
+		{IAdd, NewList(&None).ToObject(), NewList().ToObject(), NewList(&None).ToObject(), nil},
 		{IAdd, NewList().ToObject(), newObject(ObjectType), nil, mustCreateException(TypeErrorType, "'object' object is not iterable")},
 		{IMul, NewList().ToObject(), NewInt(10).ToObject(), NewList().ToObject(), nil},
 		{IMul, newTestList("baz").ToObject(), NewInt(-2).ToObject(), NewList().ToObject(), nil},
-		{IMul, NewList().ToObject(), None, nil, mustCreateException(TypeErrorType, "can't multiply sequence by non-int of type 'NoneType'")},
+		{IMul, NewList().ToObject(), &None, nil, mustCreateException(TypeErrorType, "can't multiply sequence by non-int of type 'NoneType'")},
 	}
 	for _, cas := range cases {
 		switch got, result := checkInvokeResult(wrapFuncForTest(cas.fun), []*Object{cas.v, cas.w}, cas.want, cas.wantExc); result {
@@ -184,7 +184,7 @@ func TestListInplaceOps(t *testing.T) {
 func TestListIsTrue(t *testing.T) {
 	cases := []invokeTestCase{
 		{args: wrapArgs(NewList()), want: False.ToObject()},
-		{args: wrapArgs(newTestList("foo", None)), want: True.ToObject()},
+		{args: wrapArgs(newTestList("foo", &None)), want: True.ToObject()},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(wrapFuncForTest(IsTrue), &cas); err != "" {
@@ -208,9 +208,9 @@ func TestListAppend(t *testing.T) {
 		return args[0], nil
 	}).ToObject()
 	cases := []invokeTestCase{
-		{args: wrapArgs(NewList(), None), want: NewList(None).ToObject()},
-		{args: wrapArgs(NewList(None), 42), want: newTestList(None, 42).ToObject()},
-		{args: wrapArgs(newTestList(None, 42), "foo"), want: newTestList(None, 42, "foo").ToObject()},
+		{args: wrapArgs(NewList(), &None), want: NewList(&None).ToObject()},
+		{args: wrapArgs(NewList(&None), 42), want: newTestList(&None, 42).ToObject()},
+		{args: wrapArgs(newTestList(&None, 42), "foo"), want: newTestList(&None, 42, "foo").ToObject()},
 		{args: wrapArgs(newTestRange(100), 100), want: newTestRange(101).ToObject()},
 	}
 	for _, cas := range cases {
@@ -235,8 +235,8 @@ func TestListExtend(t *testing.T) {
 		{args: wrapArgs(newTestList(), newTestList("foo")), want: newTestList("foo").ToObject()},
 		{args: wrapArgs(newTestList(3), newTestList()), want: newTestList(3).ToObject()},
 		{args: wrapArgs(NewStr(""), newTestList()), wantExc: mustCreateException(TypeErrorType, "unbound method extend() must be called with list instance as first argument (got str instance instead)")},
-		{args: wrapArgs(None, None), wantExc: mustCreateException(TypeErrorType, "unbound method extend() must be called with list instance as first argument (got NoneType instance instead)")},
-		{args: wrapArgs(newTestList(3), None), wantExc: mustCreateException(TypeErrorType, "'NoneType' object is not iterable")},
+		{args: wrapArgs(&None, &None), wantExc: mustCreateException(TypeErrorType, "unbound method extend() must be called with list instance as first argument (got NoneType instance instead)")},
+		{args: wrapArgs(newTestList(3), &None), wantExc: mustCreateException(TypeErrorType, "'NoneType' object is not iterable")},
 		{args: wrapArgs(newTestRange(5), newTestList(3)), want: newTestList(0, 1, 2, 3, 4, 3).ToObject()},
 		{args: wrapArgs(newTestRange(5), newTestList(3)), want: newTestList(0, 1, 2, 3, 4, 3).ToObject()},
 		{args: wrapArgs(newTestTuple(1, 2, 3), newTestList(3)), wantExc: mustCreateException(TypeErrorType, "unbound method extend() must be called with list instance as first argument (got tuple instance instead)")},
@@ -254,7 +254,7 @@ func TestListExtend(t *testing.T) {
 func TestListLen(t *testing.T) {
 	cases := []invokeTestCase{
 		{args: wrapArgs(NewList()), want: NewInt(0).ToObject()},
-		{args: wrapArgs(NewList(None, None, None)), want: NewInt(3).ToObject()},
+		{args: wrapArgs(NewList(&None, &None, &None)), want: NewInt(3).ToObject()},
 	}
 	for _, cas := range cases {
 		if err := runInvokeMethodTestCase(ListType, "__len__", &cas); err != "" {
@@ -267,7 +267,7 @@ func TestListNew(t *testing.T) {
 	cases := []invokeTestCase{
 		{want: NewList().ToObject()},
 		{args: wrapArgs(newTestTuple(1, 2, 3)), want: newTestList(1, 2, 3).ToObject()},
-		{args: wrapArgs(newTestDict(1, "foo", "bar", None)), want: newTestList(1, "bar").ToObject()},
+		{args: wrapArgs(newTestDict(1, "foo", "bar", &None)), want: newTestList(1, "bar").ToObject()},
 		{args: wrapArgs(42), wantExc: mustCreateException(TypeErrorType, "'int' object is not iterable")},
 	}
 	for _, cas := range cases {
@@ -329,7 +329,7 @@ func TestListInsert(t *testing.T) {
 		return l.ToObject(), nil
 	})
 	cases := []invokeTestCase{
-		{args: wrapArgs(NewList(), 0, None), want: NewList(None).ToObject()},
+		{args: wrapArgs(NewList(), 0, &None), want: NewList(&None).ToObject()},
 		{args: wrapArgs(newTestList("bar"), -100, "foo"), want: newTestList("foo", "bar").ToObject()},
 		{args: wrapArgs(newTestList("foo", "bar"), 101, "baz"), want: newTestList("foo", "bar", "baz").ToObject()},
 		{args: wrapArgs(newTestList("a", "c"), 1, "b"), want: newTestList("a", "b", "c").ToObject()},
@@ -399,8 +399,8 @@ func TestListPop(t *testing.T) {
 		{args: wrapArgs(newTestList(-1, 0, 1)), want: newTestTuple(1, newTestList(-1, 0).ToObject()).ToObject()},
 		{args: wrapArgs(newTestList(-1, 0, 1), 0), want: newTestTuple(-1, newTestList(0, 1).ToObject()).ToObject()},
 		{args: wrapArgs(newTestList(-1, 0, 1), NewLong(big.NewInt(1))), want: newTestTuple(0, newTestList(-1, 1).ToObject()).ToObject()},
-		{args: wrapArgs(newTestList(-1, 0, 1), None), wantExc: mustCreateException(TypeErrorType, "int() argument must be a string or a number, not 'NoneType'")},
-		{args: wrapArgs(newTestList(-1, 0, 1), None), wantExc: mustCreateException(TypeErrorType, "int() argument must be a string or a number, not 'NoneType'")},
+		{args: wrapArgs(newTestList(-1, 0, 1), &None), wantExc: mustCreateException(TypeErrorType, "int() argument must be a string or a number, not 'NoneType'")},
+		{args: wrapArgs(newTestList(-1, 0, 1), &None), wantExc: mustCreateException(TypeErrorType, "int() argument must be a string or a number, not 'NoneType'")},
 		{args: wrapArgs(newTestList(-1, 0, 1), 3), wantExc: mustCreateException(IndexErrorType, "list index out of range")},
 		{args: wrapArgs(newTestList()), wantExc: mustCreateException(IndexErrorType, "list index out of range")},
 		{args: wrapArgs(newTestList(), 0), wantExc: mustCreateException(IndexErrorType, "list index out of range")},
@@ -431,18 +431,18 @@ func TestListSetItem(t *testing.T) {
 		return args[0], nil
 	}).ToObject()
 	cases := []invokeTestCase{
-		{args: wrapArgs(newTestList("foo", "bar"), 1, None), want: newTestList("foo", None).ToObject()},
+		{args: wrapArgs(newTestList("foo", "bar"), 1, &None), want: newTestList("foo", &None).ToObject()},
 		{args: wrapArgs(newTestList(1, 2, 3), newTestSlice(0), newTestList(0)), want: newTestList(0, 1, 2, 3).ToObject()},
 		{args: wrapArgs(newTestList(1, 2, 3), newTestSlice(1), newTestList(4)), want: newTestList(4, 2, 3).ToObject()},
-		{args: wrapArgs(newTestList(1, 2, 3), newTestSlice(2, None), newTestList("foo")), want: newTestList(1, 2, "foo").ToObject()},
-		{args: wrapArgs(newTestList(1, 2, 3), newTestSlice(100, None), newTestList("foo")), want: newTestList(1, 2, 3, "foo").ToObject()},
-		{args: wrapArgs(newTestList(1, 2, 4, 5), newTestSlice(1, None, 2), newTestTuple("foo", "bar")), want: newTestList(1, "foo", 4, "bar").ToObject()},
-		{args: wrapArgs(newTestList(1, 2, 3), newTestSlice(None, None, 2), newTestList("foo")), wantExc: mustCreateException(ValueErrorType, "attempt to assign sequence of size 1 to extended slice of size 2")},
-		{args: wrapArgs(newTestRange(100), newTestSlice(None, None), NewList()), want: NewList().ToObject()},
+		{args: wrapArgs(newTestList(1, 2, 3), newTestSlice(2, &None), newTestList("foo")), want: newTestList(1, 2, "foo").ToObject()},
+		{args: wrapArgs(newTestList(1, 2, 3), newTestSlice(100, &None), newTestList("foo")), want: newTestList(1, 2, 3, "foo").ToObject()},
+		{args: wrapArgs(newTestList(1, 2, 4, 5), newTestSlice(1, &None, 2), newTestTuple("foo", "bar")), want: newTestList(1, "foo", 4, "bar").ToObject()},
+		{args: wrapArgs(newTestList(1, 2, 3), newTestSlice(&None, &None, 2), newTestList("foo")), wantExc: mustCreateException(ValueErrorType, "attempt to assign sequence of size 1 to extended slice of size 2")},
+		{args: wrapArgs(newTestRange(100), newTestSlice(&None, &None), NewList()), want: NewList().ToObject()},
 		{args: wrapArgs(NewList(), newTestSlice(4, 8, 0), NewList()), wantExc: mustCreateException(ValueErrorType, "slice step cannot be zero")},
-		{args: wrapArgs(newTestList("foo", "bar"), -100, None), wantExc: mustCreateException(IndexErrorType, "index out of range")},
-		{args: wrapArgs(NewList(), 101, None), wantExc: mustCreateException(IndexErrorType, "index out of range")},
-		{args: wrapArgs(newTestList(true), None, false), wantExc: mustCreateException(TypeErrorType, "list indices must be integers, not NoneType")},
+		{args: wrapArgs(newTestList("foo", "bar"), -100, &None), wantExc: mustCreateException(IndexErrorType, "index out of range")},
+		{args: wrapArgs(NewList(), 101, &None), wantExc: mustCreateException(IndexErrorType, "index out of range")},
+		{args: wrapArgs(newTestList(true), &None, false), wantExc: mustCreateException(TypeErrorType, "list indices must be integers, not NoneType")},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(fun, &cas); err != "" {

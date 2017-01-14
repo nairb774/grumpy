@@ -54,7 +54,7 @@ func TestIntBinaryOps(t *testing.T) {
 		{Mod, NewInt(3).ToObject(), NewInt(-7).ToObject(), NewInt(-4).ToObject(), nil},
 		{Mod, NewInt(MaxInt).ToObject(), NewInt(MinInt).ToObject(), NewInt(-1).ToObject(), nil},
 		{Mod, NewInt(MinInt).ToObject(), NewInt(MaxInt).ToObject(), NewInt(MaxInt - 1).ToObject(), nil},
-		{Mod, None, NewInt(-4).ToObject(), nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for %: 'NoneType' and 'int'")},
+		{Mod, &None, NewInt(-4).ToObject(), nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for %: 'NoneType' and 'int'")},
 		{Mod, NewInt(10).ToObject(), NewInt(0).ToObject(), nil, mustCreateException(ZeroDivisionErrorType, "integer division or modulo by zero")},
 		{Mod, NewInt(MinInt).ToObject(), NewInt(-1).ToObject(), NewLong(big.NewInt(0)).ToObject(), nil},
 		{Mul, NewInt(-1).ToObject(), NewInt(-3).ToObject(), NewInt(3).ToObject(), nil},
@@ -167,7 +167,7 @@ func TestIntNew(t *testing.T) {
 		{args: wrapArgs(IntType, newObject(fooType)), wantExc: mustCreateException(TypeErrorType, "__int__ returned non-int (type Foo)")},
 		{args: wrapArgs(IntType, 1, 2), wantExc: mustCreateException(TypeErrorType, "int() can't convert non-string with explicit base")},
 		{args: wrapArgs(IntType, 1, 2, 3), wantExc: mustCreateException(TypeErrorType, "int() takes at most 2 arguments (3 given)")},
-		{args: wrapArgs(IntType, "1", None), wantExc: mustCreateException(TypeErrorType, "an integer is required")},
+		{args: wrapArgs(IntType, "1", &None), wantExc: mustCreateException(TypeErrorType, "an integer is required")},
 	}
 	for _, cas := range cases {
 		if err := runInvokeMethodTestCase(IntType, "__new__", &cas); err != "" {

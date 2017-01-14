@@ -144,7 +144,7 @@ func (c *Code) Eval(f *Frame, globals *Dict, args Args, kwargs KWArgs) (*Object,
 		// frame.
 		f.RestoreExc(oldExc, oldTraceback)
 		if ret == nil {
-			ret = None
+			ret = &None
 		}
 	} else {
 		_, tb := f.ExcInfo()

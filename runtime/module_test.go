@@ -27,10 +27,10 @@ func TestImportModule(t *testing.T) {
 	bar := newTestModule("foo.bar", "foo/bar/__init__.py")
 	baz := newTestModule("foo.bar.baz", "foo/bar/baz/__init__.py")
 	qux := newTestModule("foo.qux", "foo/qux/__init__.py")
-	fooCode := NewCode("<module>", "foo/__init__.py", nil, 0, func(*Frame, []*Object) (*Object, *BaseException) { return None, nil })
-	barCode := NewCode("<module>", "foo/bar/__init__.py", nil, 0, func(*Frame, []*Object) (*Object, *BaseException) { return None, nil })
-	bazCode := NewCode("<module>", "foo/bar/baz/__init__.py", nil, 0, func(*Frame, []*Object) (*Object, *BaseException) { return None, nil })
-	quxCode := NewCode("<module>", "foo/qux/__init__.py", nil, 0, func(*Frame, []*Object) (*Object, *BaseException) { return None, nil })
+	fooCode := NewCode("<module>", "foo/__init__.py", nil, 0, func(*Frame, []*Object) (*Object, *BaseException) { return &None, nil })
+	barCode := NewCode("<module>", "foo/bar/__init__.py", nil, 0, func(*Frame, []*Object) (*Object, *BaseException) { return &None, nil })
+	bazCode := NewCode("<module>", "foo/bar/baz/__init__.py", nil, 0, func(*Frame, []*Object) (*Object, *BaseException) { return &None, nil })
+	quxCode := NewCode("<module>", "foo/qux/__init__.py", nil, 0, func(*Frame, []*Object) (*Object, *BaseException) { return &None, nil })
 	raisesCode := NewCode("<module", "raises.py", nil, 0, func(f *Frame, _ []*Object) (*Object, *BaseException) {
 		return nil, f.RaiseType(ValueErrorType, "uh oh")
 	})
@@ -43,14 +43,14 @@ func TestImportModule(t *testing.T) {
 		if _, raised := ImportModule(f, "circular", []*Code{fooCode}); raised != nil {
 			return nil, raised
 		}
-		return None, nil
+		return &None, nil
 	})
 	circularTestModule := newTestModule("circular", "circular.py").ToObject()
 	clearCode := NewCode("<module>", "clear.py", nil, 0, func(f *Frame, _ []*Object) (*Object, *BaseException) {
 		if _, raised := SysModules.DelItemString(f, "clear"); raised != nil {
 			return nil, raised
 		}
-		return None, nil
+		return &None, nil
 	})
 	// NOTE: This test progressively evolves sys.modules, checking after
 	// each test case that it's populated appropriately.
@@ -195,11 +195,11 @@ func TestImportNativeModule(t *testing.T) {
 	o := mustNotRaise(ImportNativeModule(f, "grumpy.native.foo", map[string]*Object{"Bar": bar}))
 	if !o.isInstance(ModuleType) {
 		t.Errorf(`ImportNativeModule("grumpy.native.foo") returned %v, want module`, o)
-	} else if nameAttr := mustNotRaise(GetAttr(f, o, NewStr("__name__"), None)); !nameAttr.isInstance(StrType) {
+	} else if nameAttr := mustNotRaise(GetAttr(f, o, NewStr("__name__"), &None)); !nameAttr.isInstance(StrType) {
 		t.Errorf(`ImportNativeModule("grumpy.native.foo") returned module with non-string name %v`, nameAttr)
 	} else if gotName := toStrUnsafe(nameAttr).Value(); gotName != "grumpy.native.foo" {
 		t.Errorf(`ImportNativeModule("grumpy.native.foo") returned module named %q, want "grumpy.native.foo"`, gotName)
-	} else if gotBar := mustNotRaise(GetAttr(f, o, NewStr("Bar"), None)); gotBar != bar {
+	} else if gotBar := mustNotRaise(GetAttr(f, o, NewStr("Bar"), &None)); gotBar != bar {
 		t.Errorf("foo.Bar = %v, want %v", gotBar, bar)
 	}
 }
@@ -234,18 +234,18 @@ func TestModuleInit(t *testing.T) {
 		if raised != nil {
 			return nil, raised
 		}
-		name, raised := GetAttr(f, o, NewStr("__name__"), None)
+		name, raised := GetAttr(f, o, NewStr("__name__"), &None)
 		if raised != nil {
 			return nil, raised
 		}
-		doc, raised := GetAttr(f, o, NewStr("__doc__"), None)
+		doc, raised := GetAttr(f, o, NewStr("__doc__"), &None)
 		if raised != nil {
 			return nil, raised
 		}
 		return NewTuple(name, doc), nil
 	})
 	cases := []invokeTestCase{
-		{args: wrapArgs("foo"), want: newTestTuple("foo", None).ToObject()},
+		{args: wrapArgs("foo"), want: newTestTuple("foo", &None).ToObject()},
 		{args: wrapArgs("foo", 123), want: newTestTuple("foo", 123).ToObject()},
 		{args: wrapArgs(newObject(ObjectType)), wantExc: mustCreateException(TypeErrorType, `'__init__' requires a 'str' object but received a "object"`)},
 		{wantExc: mustCreateException(TypeErrorType, "'__init__' requires 2 arguments")},
@@ -284,9 +284,9 @@ func TestRunMain(t *testing.T) {
 		wantCode   int
 		wantOutput string
 	}{
-		{NewCode("<test>", "test.py", nil, 0, func(*Frame, []*Object) (*Object, *BaseException) { return None, nil }), 0, ""},
+		{NewCode("<test>", "test.py", nil, 0, func(*Frame, []*Object) (*Object, *BaseException) { return &None, nil }), 0, ""},
 		{NewCode("<test>", "test.py", nil, 0, func(f *Frame, _ []*Object) (*Object, *BaseException) {
-			return nil, f.Raise(SystemExitType.ToObject(), None, nil)
+			return nil, f.Raise(SystemExitType.ToObject(), &None, nil)
 		}), 0, ""},
 		{NewCode("<test>", "test.py", nil, 0, func(f *Frame, _ []*Object) (*Object, *BaseException) { return nil, f.RaiseType(TypeErrorType, "foo") }), 1, "TypeError: foo\n"},
 		{NewCode("<test>", "test.py", nil, 0, func(f *Frame, _ []*Object) (*Object, *BaseException) { return nil, f.RaiseType(SystemExitType, "foo") }), 1, "foo\n"},

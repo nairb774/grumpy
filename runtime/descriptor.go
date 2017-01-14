@@ -50,7 +50,7 @@ func initPropertyType(map[string]*Object) {
 
 func propertyDelete(f *Frame, desc, inst *Object) *BaseException {
 	p := toPropertyUnsafe(desc)
-	if p.del == nil || p.del == None {
+	if p.del == nil || p.del == &None {
 		return f.RaiseType(AttributeErrorType, "can't delete attribute")
 	}
 	_, raised := p.del.Call(f, Args{inst}, nil)
@@ -59,7 +59,7 @@ func propertyDelete(f *Frame, desc, inst *Object) *BaseException {
 
 func propertyGet(f *Frame, desc, instance *Object, _ *Type) (*Object, *BaseException) {
 	p := toPropertyUnsafe(desc)
-	if p.get == nil || p.get == None {
+	if p.get == nil || p.get == &None {
 		return nil, f.RaiseType(AttributeErrorType, "unreadable attribute")
 	}
 	return p.get.Call(f, Args{instance}, nil)
@@ -84,12 +84,12 @@ func propertyInit(f *Frame, o *Object, args Args, _ KWArgs) (*Object, *BaseExcep
 	if argc > 2 {
 		p.del = args[2]
 	}
-	return None, nil
+	return &None, nil
 }
 
 func propertySet(f *Frame, desc, inst, value *Object) *BaseException {
 	p := toPropertyUnsafe(desc)
-	if p.set == nil || p.set == None {
+	if p.set == nil || p.set == &None {
 		return f.RaiseType(AttributeErrorType, "can't set attribute")
 	}
 	_, raised := p.set.Call(f, Args{inst, value}, nil)
@@ -117,5 +117,5 @@ func makeStructFieldDescriptor(t *Type, fieldName, propertyName string) *Object 
 		}
 		return ret, raised
 	}
-	return newProperty(newBuiltinFunction("_get"+fieldName, getterFunc).ToObject(), None, None).ToObject()
+	return newProperty(newBuiltinFunction("_get"+fieldName, getterFunc).ToObject(), &None, &None).ToObject()
 }

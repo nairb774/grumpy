@@ -53,7 +53,7 @@ func superInit(f *Frame, o *Object, args Args, _ KWArgs) (*Object, *BaseExceptio
 	sup.sub = sub
 	sup.obj = obj
 	sup.objType = objType
-	return None, nil
+	return &None, nil
 }
 
 func superGetAttribute(f *Frame, o *Object, name *Str) (*Object, *BaseException) {

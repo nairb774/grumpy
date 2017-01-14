@@ -31,7 +31,7 @@ func TestFileInit(t *testing.T) {
 	f := newTestFile("blah blah")
 	defer f.cleanup()
 	cases := []invokeTestCase{
-		{args: wrapArgs(newObject(FileType), f.path), want: None},
+		{args: wrapArgs(newObject(FileType), f.path), want: &None},
 		{args: wrapArgs(newObject(FileType)), wantExc: mustCreateException(TypeErrorType, "'__init__' requires 2 arguments")},
 		{args: wrapArgs(newObject(FileType), f.path, "abc"), wantExc: mustCreateException(ValueErrorType, `invalid mode string: "abc"`)},
 		{args: wrapArgs(newObject(FileType), f.path, "w+"), wantExc: mustCreateException(ValueErrorType, `invalid mode string: "w+"`)},
@@ -53,8 +53,8 @@ func TestFileCloseExit(t *testing.T) {
 		// it's open even though the underlying file was closed.
 		closedFile.file.Close()
 		cases := []invokeTestCase{
-			{args: wrapArgs(newObject(FileType)), want: None},
-			{args: wrapArgs(f.open("r")), want: None},
+			{args: wrapArgs(newObject(FileType)), want: &None},
+			{args: wrapArgs(f.open("r")), want: &None},
 			{args: wrapArgs(closedFile), wantExc: mustCreateException(IOErrorType, "invalid argument")},
 		}
 		for _, cas := range cases {
@@ -246,7 +246,7 @@ func TestFileStrRepr(t *testing.T) {
 			return nil, raised
 		}
 		Assert(f, GetBool(re.MatchString(s.Value())).ToObject(), nil)
-		return None, nil
+		return &None, nil
 	}).ToObject()
 	f := newTestFile("foo\nbar")
 	defer f.cleanup()
@@ -255,10 +255,10 @@ func TestFileStrRepr(t *testing.T) {
 	// Open a file for write.
 	writeFile := f.open("wb")
 	cases := []invokeTestCase{
-		{args: wrapArgs(f.open("r"), `^<open file "[^"]+", mode "r" at \w+>$`), want: None},
-		{args: wrapArgs(writeFile, `^<open file "[^"]+", mode "wb" at \w+>$`), want: None},
-		{args: wrapArgs(newObject(FileType), `^<closed file "<uninitialized file>", mode "<uninitialized file>" at \w+>$`), want: None},
-		{args: wrapArgs(closedFile, `^<closed file "[^"]+", mode "r" at \w+>$`), want: None},
+		{args: wrapArgs(f.open("r"), `^<open file "[^"]+", mode "r" at \w+>$`), want: &None},
+		{args: wrapArgs(writeFile, `^<open file "[^"]+", mode "wb" at \w+>$`), want: &None},
+		{args: wrapArgs(newObject(FileType), `^<closed file "<uninitialized file>", mode "<uninitialized file>" at \w+>$`), want: &None},
+		{args: wrapArgs(closedFile, `^<closed file "[^"]+", mode "r" at \w+>$`), want: &None},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(fun, &cas); err != "" {

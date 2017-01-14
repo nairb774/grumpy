@@ -39,7 +39,7 @@ func TestFrameArgsCache(t *testing.T) {
 	if arg0 := args2[0]; arg0 != nil {
 		t.Errorf("f.MakeArgs(1)[0] = %v, want nil", arg0)
 	}
-	args2[0] = None // Make sure this is cleared in MakeArgs result below.
+	args2[0] = &None // Make sure this is cleared in MakeArgs result below.
 	f.FreeArgs(args2)
 	args3 := f.MakeArgs(1)
 	if &args2[0] != &args3[0] {
@@ -106,7 +106,7 @@ func TestFrameRaise(t *testing.T) {
 	raisedFrame := NewRootFrame()
 	raisedFrame.RestoreExc(mustCreateException(ValueErrorType, "foo"), newTraceback(raisedFrame, nil))
 	tb := newTraceback(f, nil)
-	multiArgExc := toBaseExceptionUnsafe(mustNotRaise(ExceptionType.Call(f, []*Object{None, None}, nil)))
+	multiArgExc := toBaseExceptionUnsafe(mustNotRaise(ExceptionType.Call(f, []*Object{&None, &None}, nil)))
 	barType := newTestClass("Bar", []*Type{ExceptionType}, newStringDict(map[string]*Object{
 		"__new__": newBuiltinFunction("__new__", func(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
 			return NewStr("Bar").ToObject(), nil
@@ -128,7 +128,7 @@ func TestFrameRaise(t *testing.T) {
 		{f, NewInt(42).ToObject(), nil, nil, mustCreateException(TypeErrorType, `exceptions must be derived from BaseException, not "int"`), tb},
 		{f, ObjectType.ToObject(), nil, nil, mustCreateException(TypeErrorType, `exceptions must be derived from BaseException, not "object"`), tb},
 		{f, AssertionErrorType.ToObject(), NewStr("foo").ToObject(), nil, mustCreateException(AssertionErrorType, "foo"), tb},
-		{f, ExceptionType.ToObject(), NewTuple(None, None).ToObject(), nil, multiArgExc, tb},
+		{f, ExceptionType.ToObject(), NewTuple(&None, &None).ToObject(), nil, multiArgExc, tb},
 		{f, ExceptionType.ToObject(), mustCreateException(KeyErrorType, "foo").ToObject(), nil, mustCreateException(KeyErrorType, "foo"), tb},
 		{f, barType.ToObject(), nil, nil, mustCreateException(TypeErrorType, `exceptions must be derived from BaseException, not "str"`), tb},
 		{f, newObject(StopIterationType), NewInt(123).ToObject(), nil, mustCreateException(TypeErrorType, "instance exception may not have a separate value"), tb},
@@ -212,7 +212,7 @@ func TestFrameExcInfo(t *testing.T) {
 	raisedTB := newTraceback(raisedFrame, nil)
 	raisedFrame.RestoreExc(raisedExc, raisedTB)
 	cases := []invokeTestCase{
-		{args: wrapArgs(NewRootFrame()), want: NewTuple(None, None).ToObject()},
+		{args: wrapArgs(NewRootFrame()), want: NewTuple(&None, &None).ToObject()},
 		{args: wrapArgs(raisedFrame), want: newTestTuple(raisedExc, raisedTB).ToObject()},
 	}
 	for _, cas := range cases {

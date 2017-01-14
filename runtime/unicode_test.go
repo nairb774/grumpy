@@ -52,7 +52,7 @@ func TestUnicodeBinaryOps(t *testing.T) {
 		{args: wrapArgs(Add, "foo", NewUnicode("bar")), want: NewUnicode("foobar").ToObject()},
 		{args: wrapArgs(Add, NewUnicode("baz"), NewUnicode("")), want: NewUnicode("baz").ToObject()},
 		{args: wrapArgs(Add, NewUnicode(""), newObject(ObjectType)), wantExc: mustCreateException(TypeErrorType, "coercing to Unicode: need string, object found")},
-		{args: wrapArgs(Add, None, NewUnicode("")), wantExc: mustCreateException(TypeErrorType, "unsupported operand type(s) for +: 'NoneType' and 'unicode'")},
+		{args: wrapArgs(Add, &None, NewUnicode("")), wantExc: mustCreateException(TypeErrorType, "unsupported operand type(s) for +: 'NoneType' and 'unicode'")},
 		{args: wrapArgs(Mul, NewUnicode(""), 10), want: NewUnicode("").ToObject()},
 		{args: wrapArgs(Mul, NewUnicode("foo"), -2), want: NewUnicode("").ToObject()},
 		{args: wrapArgs(Mul, NewUnicode("foobar"), 0), want: NewUnicode("").ToObject()},
@@ -83,7 +83,7 @@ func TestUnicodeCompare(t *testing.T) {
 		{args: wrapArgs(NewUnicode("bar"), NewUnicode("baz")), want: compareAllResultLT},
 		{args: wrapArgs(NewUnicode("bar"), "baz"), want: compareAllResultLT},
 		{args: wrapArgs(NewStr("bar"), NewUnicode("baz")), want: compareAllResultLT},
-		{args: wrapArgs(NewUnicode("abc"), None), want: compareAllResultGT},
+		{args: wrapArgs(NewUnicode("abc"), &None), want: compareAllResultGT},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(compareAll, &cas); err != "" {
@@ -133,9 +133,9 @@ func TestUnicodeGetItem(t *testing.T) {
 		{args: wrapArgs(NewUnicode("baz"), -4), wantExc: mustCreateException(IndexErrorType, "index out of range")},
 		{args: wrapArgs(NewUnicode(""), 0), wantExc: mustCreateException(IndexErrorType, "index out of range")},
 		{args: wrapArgs(NewUnicode("foo"), 3), wantExc: mustCreateException(IndexErrorType, "index out of range")},
-		{args: wrapArgs(NewUnicode("bar"), newTestSlice(None, 2)), want: NewStr("ba").ToObject()},
+		{args: wrapArgs(NewUnicode("bar"), newTestSlice(&None, 2)), want: NewStr("ba").ToObject()},
 		{args: wrapArgs(NewUnicode("bar"), newTestSlice(1, 3)), want: NewStr("ar").ToObject()},
-		{args: wrapArgs(NewUnicode("bar"), newTestSlice(1, None)), want: NewStr("ar").ToObject()},
+		{args: wrapArgs(NewUnicode("bar"), newTestSlice(1, &None)), want: NewStr("ar").ToObject()},
 		{args: wrapArgs(NewUnicode("foobarbaz"), newTestSlice(1, 8, 2)), want: NewStr("obra").ToObject()},
 		{args: wrapArgs(NewUnicode("bar"), newTestSlice(1, 2, 0)), wantExc: mustCreateException(ValueErrorType, "slice step cannot be zero")},
 	}
@@ -302,7 +302,7 @@ func TestUnicodeNewSubclass(t *testing.T) {
 		}
 		return nil
 	})
-	if err := runInvokeTestCase(fun, &invokeTestCase{want: None}); err != "" {
+	if err := runInvokeTestCase(fun, &invokeTestCase{want: &None}); err != "" {
 		t.Error(err)
 	}
 }

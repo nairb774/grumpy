@@ -45,11 +45,11 @@ func TestSliceCalcSize(t *testing.T) {
 
 func TestSliceCompare(t *testing.T) {
 	cases := []invokeTestCase{
-		{args: wrapArgs(newTestSlice(None), newTestSlice(None)), want: compareAllResultEq},
+		{args: wrapArgs(newTestSlice(&None), newTestSlice(&None)), want: compareAllResultEq},
 		{args: wrapArgs(newTestSlice(2), newTestSlice(1)), want: compareAllResultGT},
 		{args: wrapArgs(newTestSlice(1, 2), newTestSlice(1, 3)), want: compareAllResultLT},
 		{args: wrapArgs(newTestSlice(1, 2, 3), newTestSlice(1, 2)), want: compareAllResultGT},
-		{args: wrapArgs(None, newTestSlice(1, 2)), want: compareAllResultLT},
+		{args: wrapArgs(&None, newTestSlice(1, 2)), want: compareAllResultLT},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(compareAll, &cas); err != "" {
@@ -63,7 +63,7 @@ func TestSliceNew(t *testing.T) {
 		{args: nil, wantExc: mustCreateException(TypeErrorType, "'__new__' of 'object' requires 3 arguments")},
 		{args: wrapArgs(10), want: (&Slice{Object{typ: SliceType}, nil, NewInt(10).ToObject(), nil}).ToObject()},
 		{args: wrapArgs(1.2, "foo"), want: (&Slice{Object{typ: SliceType}, NewFloat(1.2).ToObject(), NewStr("foo").ToObject(), nil}).ToObject()},
-		{args: wrapArgs(None, None, true), want: (&Slice{Object{typ: SliceType}, None, None, True.ToObject()}).ToObject()},
+		{args: wrapArgs(&None, &None, true), want: (&Slice{Object{typ: SliceType}, &None, &None, True.ToObject()}).ToObject()},
 		{args: wrapArgs(1, 2, 3, 4), wantExc: mustCreateException(TypeErrorType, "'__new__' of 'object' requires 3 arguments")},
 	}
 	for _, cas := range cases {

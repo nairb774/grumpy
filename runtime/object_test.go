@@ -28,7 +28,7 @@ func TestObjectCall(t *testing.T) {
 	kwargs := wrapKWArgs("kwarg", newObject(ObjectType))
 	kwargsDict := kwargs.makeDict()
 	fn := func(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
-		kwargsOrNone := None
+		kwargsOrNone := &None
 		if len(kwargs) > 0 {
 			kwargsOrNone = kwargs.makeDict().ToObject()
 		}
@@ -47,10 +47,10 @@ func TestObjectCall(t *testing.T) {
 		invokeTestCase
 	}{
 		{foo, invokeTestCase{args: args, kwargs: kwargs, want: newTestTuple(NewTuple(args...), kwargsDict).ToObject()}},
-		{foo, invokeTestCase{args: args, want: newTestTuple(NewTuple(args...).ToObject(), None).ToObject()}},
+		{foo, invokeTestCase{args: args, want: newTestTuple(NewTuple(args...).ToObject(), &None).ToObject()}},
 		{foo, invokeTestCase{kwargs: kwargs, want: newTestTuple(NewTuple(), kwargsDict).ToObject()}},
-		{foo, invokeTestCase{want: newTestTuple(NewTuple(), None).ToObject()}},
-		{foo, invokeTestCase{args: wrapArgs(arg0), want: newTestTuple(NewTuple(arg0), None).ToObject()}},
+		{foo, invokeTestCase{want: newTestTuple(NewTuple(), &None).ToObject()}},
+		{foo, invokeTestCase{args: wrapArgs(arg0), want: newTestTuple(NewTuple(arg0), &None).ToObject()}},
 		{callable, invokeTestCase{args: args, kwargs: kwargs, want: newTestTuple(NewTuple(callable, arg0, arg1), kwargsDict).ToObject()}},
 		{newObject(ObjectType), invokeTestCase{wantExc: mustCreateException(TypeErrorType, "'object' object is not callable")}},
 		{raisesFunc, invokeTestCase{wantExc: mustCreateException(RuntimeErrorType, "bar")}},
@@ -101,7 +101,7 @@ func TestObjectDelAttr(t *testing.T) {
 		if raised := DelAttr(f, o, name); raised != nil {
 			return nil, raised
 		}
-		return GetAttr(f, o, name, None)
+		return GetAttr(f, o, name, &None)
 	})
 	dellerType := newTestClass("Deller", []*Type{ObjectType}, newStringDict(map[string]*Object{
 		"__get__": newBuiltinFunction("__get__", func(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
@@ -122,7 +122,7 @@ func TestObjectDelAttr(t *testing.T) {
 			if !deleted {
 				return nil, f.RaiseType(AttributeErrorType, "attr")
 			}
-			return None, nil
+			return &None, nil
 		}).ToObject(),
 	}))
 	fooType := newTestClass("Foo", []*Type{ObjectType}, newStringDict(map[string]*Object{"deller": newObject(dellerType)}))
@@ -131,7 +131,7 @@ func TestObjectDelAttr(t *testing.T) {
 		t.Fatal(raised)
 	}
 	cases := []invokeTestCase{
-		{args: wrapArgs(foo, "deller"), want: None},
+		{args: wrapArgs(foo, "deller"), want: &None},
 		{args: wrapArgs(newObject(fooType), "foo"), wantExc: mustCreateException(AttributeErrorType, "'Foo' object has no attribute 'foo'")},
 		{args: wrapArgs(newObject(fooType), "deller"), wantExc: mustCreateException(AttributeErrorType, "attr")},
 	}
@@ -165,7 +165,7 @@ func TestObjectGetAttribute(t *testing.T) {
 			return NewStr("got setter").ToObject(), nil
 		}).ToObject(),
 		"__set__": newBuiltinFunction("__set__", func(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
-			return None, nil
+			return &None, nil
 		}).ToObject(),
 	}))
 	setter := newObject(setterType)
@@ -213,7 +213,7 @@ func TestObjectNew(t *testing.T) {
 		{args: wrapArgs(ExceptionType), want: newObject(ExceptionType)},
 		{args: wrapArgs(IntType), want: NewInt(0).ToObject()},
 		{wantExc: mustCreateException(TypeErrorType, "'__new__' requires 1 arguments")},
-		{args: wrapArgs(None), wantExc: mustCreateException(TypeErrorType, `'__new__' requires a 'type' object but received a "NoneType"`)},
+		{args: wrapArgs(&None), wantExc: mustCreateException(TypeErrorType, `'__new__' requires a 'type' object but received a "NoneType"`)},
 		{args: wrapArgs(foo), wantExc: mustCreateException(TypeErrorType, "object.__new__(Foo) is not safe, use Foo.__new__()")},
 	}
 	for _, cas := range cases {
@@ -256,16 +256,16 @@ func TestObjectReduce(t *testing.T) {
 		}
 		// Return the reconstructed object, object state, list items
 		// and dict items.
-		state, list, dict := None, None, None
-		if numElems > 2 && elems[2] != None {
+		state, list, dict := &None, &None, &None
+		if numElems > 2 && elems[2] != &None {
 			state = elems[2]
 		}
-		if numElems > 3 && elems[3] != None {
+		if numElems > 3 && elems[3] != &None {
 			if list, raised = ListType.Call(f, Args{elems[3]}, nil); raised != nil {
 				return nil, raised
 			}
 		}
-		if numElems > 4 && elems[4] != None {
+		if numElems > 4 && elems[4] != &None {
 			if dict, raised = DictType.Call(f, Args{elems[4]}, nil); raised != nil {
 				return nil, raised
 			}
@@ -301,23 +301,23 @@ func TestObjectReduce(t *testing.T) {
 	intSubclassInst := &Int{Object{typ: intSubclass}, 123}
 	cases := []invokeTestCase{
 		{args: wrapArgs("__reduce__", 42, Args{}), wantExc: mustCreateException(TypeErrorType, "can't pickle int objects")},
-		{args: wrapArgs("__reduce__", 42, wrapArgs(2)), want: newTestTuple(42, None, None, None).ToObject()},
+		{args: wrapArgs("__reduce__", 42, wrapArgs(2)), want: newTestTuple(42, &None, &None, &None).ToObject()},
 		{args: wrapArgs("__reduce_ex__", 42, Args{}), wantExc: mustCreateException(TypeErrorType, "can't pickle int objects")},
 		{args: wrapArgs("__reduce__", 3.14, wrapArgs("bad proto")), wantExc: mustCreateException(TypeErrorType, "'__reduce__' requires a 'int' object but received a 'str'")},
 		{args: wrapArgs("__reduce_ex__", 3.14, wrapArgs("bad proto")), wantExc: mustCreateException(TypeErrorType, "'__reduce_ex__' requires a 'int' object but received a 'str'")},
-		{args: wrapArgs("__reduce__", newObject(fooType), Args{}), want: newTestTuple("", NewDict(), None, None).ToObject()},
-		{args: wrapArgs("__reduce__", newObject(fooType), wrapArgs(2)), want: newTestTuple("", NewDict(), None, None).ToObject()},
-		{args: wrapArgs("__reduce_ex__", newObject(fooType), Args{}), want: newTestTuple("", NewDict(), None, None).ToObject()},
-		{args: wrapArgs("__reduce_ex__", newObject(reduceOverrideType), Args{}), want: newTestTuple("ReduceOverride", None, None, None).ToObject()},
-		{args: wrapArgs("__reduce__", fooNoDict, Args{}), want: newTestTuple("fooNoDict", None, None, None).ToObject()},
-		{args: wrapArgs("__reduce__", newTestList(1, 2, 3), wrapArgs(2)), want: newTestTuple(NewList(), None, newTestList(1, 2, 3), None).ToObject()},
-		{args: wrapArgs("__reduce__", newTestDict("a", 1, "b", 2), wrapArgs(2)), want: newTestTuple(NewDict(), None, None, newTestDict("a", 1, "b", 2)).ToObject()},
+		{args: wrapArgs("__reduce__", newObject(fooType), Args{}), want: newTestTuple("", NewDict(), &None, &None).ToObject()},
+		{args: wrapArgs("__reduce__", newObject(fooType), wrapArgs(2)), want: newTestTuple("", NewDict(), &None, &None).ToObject()},
+		{args: wrapArgs("__reduce_ex__", newObject(fooType), Args{}), want: newTestTuple("", NewDict(), &None, &None).ToObject()},
+		{args: wrapArgs("__reduce_ex__", newObject(reduceOverrideType), Args{}), want: newTestTuple("ReduceOverride", &None, &None, &None).ToObject()},
+		{args: wrapArgs("__reduce__", fooNoDict, Args{}), want: newTestTuple("fooNoDict", &None, &None, &None).ToObject()},
+		{args: wrapArgs("__reduce__", newTestList(1, 2, 3), wrapArgs(2)), want: newTestTuple(NewList(), &None, newTestList(1, 2, 3), &None).ToObject()},
+		{args: wrapArgs("__reduce__", newTestDict("a", 1, "b", 2), wrapArgs(2)), want: newTestTuple(NewDict(), &None, &None, newTestDict("a", 1, "b", 2)).ToObject()},
 		{args: wrapArgs("__reduce__", newObject(getNewArgsRaisesType), wrapArgs(2)), wantExc: mustCreateException(RuntimeErrorType, "uh oh")},
 		{args: wrapArgs("__reduce__", newObject(getNewArgsReturnsNonTupleType), wrapArgs(2)), wantExc: mustCreateException(TypeErrorType, "__getnewargs__ should return a tuple, not 'int'")},
-		{args: wrapArgs("__reduce__", newTestTuple("foo", "bar"), wrapArgs(2)), want: newTestTuple(newTestTuple("foo", "bar"), None, None, None).ToObject()},
-		{args: wrapArgs("__reduce__", 3.14, wrapArgs(2)), want: newTestTuple(3.14, None, None, None).ToObject()},
-		{args: wrapArgs("__reduce__", NewUnicode("abc"), wrapArgs(2)), want: newTestTuple(NewUnicode("abc"), None, None, None).ToObject()},
-		{args: wrapArgs("__reduce__", intSubclassInst, Args{}), want: newTestTuple(intSubclassInst, None, None, None).ToObject()},
+		{args: wrapArgs("__reduce__", newTestTuple("foo", "bar"), wrapArgs(2)), want: newTestTuple(newTestTuple("foo", "bar"), &None, &None, &None).ToObject()},
+		{args: wrapArgs("__reduce__", 3.14, wrapArgs(2)), want: newTestTuple(3.14, &None, &None, &None).ToObject()},
+		{args: wrapArgs("__reduce__", NewUnicode("abc"), wrapArgs(2)), want: newTestTuple(NewUnicode("abc"), &None, &None, &None).ToObject()},
+		{args: wrapArgs("__reduce__", intSubclassInst, Args{}), want: newTestTuple(intSubclassInst, &None, &None, &None).ToObject()},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(fun, &cas); err != "" {
@@ -331,7 +331,7 @@ func TestObjectSetAttr(t *testing.T) {
 		if raised := SetAttr(f, o, name, value); raised != nil {
 			return nil, raised
 		}
-		return GetAttr(f, o, name, None)
+		return GetAttr(f, o, name, &None)
 	})
 	setterType := newTestClass("Setter", []*Type{ObjectType}, newStringDict(map[string]*Object{
 		"__get__": newBuiltinFunction("__get__", func(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
@@ -348,7 +348,7 @@ func TestObjectSetAttr(t *testing.T) {
 			if raised := args[1].dict.SetItemString(f, "attr", NewTuple(args.makeCopy()...).ToObject()); raised != nil {
 				return nil, raised
 			}
-			return None, nil
+			return &None, nil
 		}).ToObject(),
 	}))
 	setter := newObject(setterType)
@@ -390,9 +390,9 @@ func TestObjectStrRepr(t *testing.T) {
 	noReprMethodType.mro = []*Type{noReprMethodType}
 	fooType := newTestClass("Foo", []*Type{ObjectType}, newTestDict("__module__", "foo.bar"))
 	cases := []invokeTestCase{
-		{args: wrapArgs(newObject(ObjectType), `^<object object at \w+>$`), want: None},
-		{args: wrapArgs(newObject(noReprMethodType), `^<noReprMethod object at \w+>$`), want: None},
-		{args: wrapArgs(newObject(fooType), `<foo\.bar\.Foo object at \w+>`), want: None},
+		{args: wrapArgs(newObject(ObjectType), `^<object object at \w+>$`), want: &None},
+		{args: wrapArgs(newObject(noReprMethodType), `^<noReprMethod object at \w+>$`), want: &None},
+		{args: wrapArgs(newObject(fooType), `<foo\.bar\.Foo object at \w+>`), want: &None},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(fun, &cas); err != "" {

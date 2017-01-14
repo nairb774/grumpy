@@ -46,7 +46,7 @@ func TestNativeMetaclassNew(t *testing.T) {
 		return nil
 	})
 	cases := []invokeTestCase{
-		{want: None},
+		{want: &None},
 		{args: wrapArgs("abc"), wantExc: mustCreateException(TypeErrorType, "'new' of 'nativetype' requires 1 arguments")},
 	}
 	for _, cas := range cases {
@@ -61,7 +61,7 @@ func TestNativeFuncCall(t *testing.T) {
 		fun interface{}
 		invokeTestCase
 	}{
-		{func() {}, invokeTestCase{want: None}},
+		{func() {}, invokeTestCase{want: &None}},
 		{func() float32 { return 2.0 }, invokeTestCase{want: NewFloat(2.0).ToObject()}},
 		{func(s string) string { return s }, invokeTestCase{args: wrapArgs("foo"), want: NewStr("foo").ToObject()}},
 		{func() (int, string) { return 42, "bar" }, invokeTestCase{want: newTestTuple(42, "bar").ToObject()}},
@@ -99,7 +99,7 @@ func TestNativeFuncName(t *testing.T) {
 	})
 	cases := []invokeTestCase{
 		{args: wrapArgs(TestNativeFuncName), want: NewStr("grumpy.TestNativeFuncName").ToObject()},
-		{args: wrapArgs(None), wantExc: mustCreateException(TypeErrorType, "'_get_name' requires a 'func' object but received a 'NoneType'")},
+		{args: wrapArgs(&None), wantExc: mustCreateException(TypeErrorType, "'_get_name' requires a 'func' object but received a 'NoneType'")},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(fun, &cas); err != "" {
@@ -136,7 +136,7 @@ func TestNativeFuncStrRepr(t *testing.T) {
 			}
 			return nil
 		})
-		if err := runInvokeTestCase(fun, &invokeTestCase{args: cas.args, want: None}); err != "" {
+		if err := runInvokeTestCase(fun, &invokeTestCase{args: cas.args, want: &None}); err != "" {
 			t.Error(err)
 		}
 	}
@@ -226,10 +226,10 @@ func TestWrapNative(t *testing.T) {
 		{uint64(MaxInt) + 100, NewLong(new(big.Int).SetUint64(uint64(MaxInt) + 100)).ToObject(), nil},
 		{o, o, nil},
 		{d, d.ToObject(), nil},
-		{(*Object)(nil), None, nil},
+		{(*Object)(nil), &None, nil},
 		{uintptr(123), NewInt(123).ToObject(), nil},
 		{n, n.ToObject(), nil},
-		{(chan int)(nil), None, nil},
+		{(chan int)(nil), &None, nil},
 		{[]rune("hola"), NewUnicode("hola").ToObject(), nil},
 		{big.NewInt(12345), NewLong(big.NewInt(12345)).ToObject(), nil},
 		{*big.NewInt(12345), NewLong(big.NewInt(12345)).ToObject(), nil},
@@ -270,7 +270,7 @@ func TestWrapNativeInterface(t *testing.T) {
 	if nilVal.Kind() != reflect.Interface {
 		t.Fatalf("nilVal.Kind() = %v, want interface", nilVal.Kind())
 	}
-	if o := mustNotRaise(WrapNative(NewRootFrame(), nilVal)); o != None {
+	if o := mustNotRaise(WrapNative(NewRootFrame(), nilVal)); o != &None {
 		t.Errorf("WrapNative(%v) = %v, want None", nilVal, o)
 	}
 }
@@ -293,7 +293,7 @@ func TestWrapNativeOpaque(t *testing.T) {
 		}
 		return nil
 	})
-	if err := runInvokeTestCase(fun, &invokeTestCase{want: None}); err != "" {
+	if err := runInvokeTestCase(fun, &invokeTestCase{want: &None}); err != "" {
 		t.Error(err)
 	}
 }
@@ -396,8 +396,8 @@ func TestMaybeConvertValue(t *testing.T) {
 		{NewInt(42).ToObject(), reflect.TypeOf(int(0)), 42, nil},
 		{NewFloat(0.5).ToObject(), reflect.TypeOf(float32(0)), float32(0.5), nil},
 		{fooNative.ToObject(), reflect.TypeOf(&fooStruct{}), foo, nil},
-		{None, reflect.TypeOf((*int)(nil)), (*int)(nil), nil},
-		{None, reflect.TypeOf(""), nil, mustCreateException(TypeErrorType, "cannot convert None to string")},
+		{&None, reflect.TypeOf((*int)(nil)), (*int)(nil), nil},
+		{&None, reflect.TypeOf(""), nil, mustCreateException(TypeErrorType, "cannot convert None to string")},
 	}
 	for _, cas := range cases {
 		fun := wrapFuncForTest(func(f *Frame) *BaseException {
@@ -414,7 +414,7 @@ func TestMaybeConvertValue(t *testing.T) {
 		if cas.wantExc != nil {
 			testCase.wantExc = cas.wantExc
 		} else {
-			testCase.want = None
+			testCase.want = &None
 		}
 		if err := runInvokeTestCase(fun, &testCase); err != "" {
 			t.Error(err)

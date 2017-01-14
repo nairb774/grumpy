@@ -27,7 +27,7 @@ func TestWeakRefCall(t *testing.T) {
 	cases := []invokeTestCase{
 		{args: wrapArgs(aliveRef), want: alive},
 		{args: wrapArgs(dupRef), want: alive},
-		{args: wrapArgs(deadRef), want: None},
+		{args: wrapArgs(deadRef), want: &None},
 		{args: wrapArgs(aliveRef, 123), wantExc: mustCreateException(TypeErrorType, "'__call__' requires 0 arguments")},
 	}
 	for _, cas := range cases {

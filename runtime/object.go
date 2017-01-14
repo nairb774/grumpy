@@ -244,11 +244,11 @@ func objectReconstructor(f *Frame, args Args, _ KWArgs) (*Object, *BaseException
 		return nil, raised
 	}
 	if basisType != ObjectType {
-		initMethod, raised := GetAttr(f, basisType.ToObject(), NewStr("__init__"), None)
+		initMethod, raised := GetAttr(f, basisType.ToObject(), NewStr("__init__"), &None)
 		if raised != nil {
 			return nil, raised
 		}
-		if initMethod != None {
+		if initMethod != &None {
 			if _, raised := initMethod.Call(f, Args{o, state}, nil); raised != nil {
 				return nil, raised
 			}
@@ -274,7 +274,7 @@ func objectReduceCommon(f *Frame, args Args) (*Object, *BaseException) {
 			// copy_reg._reduce_ex in CPython.
 			return nil, f.RaiseType(TypeErrorType, fmt.Sprintf("can't pickle %s objects", t.Name()))
 		}
-		state := None
+		state := &None
 		if basisType != ObjectType {
 			// For subclasses of basis types having state (e.g.
 			// integer values), the state is captured by creating
@@ -290,11 +290,11 @@ func objectReduceCommon(f *Frame, args Args) (*Object, *BaseException) {
 		return NewTuple(objectReconstructorFunc, newArgs).ToObject(), nil
 	}
 	newArgs := []*Object{t.ToObject()}
-	getNewArgsMethod, raised := GetAttr(f, o, NewStr("__getnewargs__"), None)
+	getNewArgsMethod, raised := GetAttr(f, o, NewStr("__getnewargs__"), &None)
 	if raised != nil {
 		return nil, raised
 	}
-	if getNewArgsMethod != None {
+	if getNewArgsMethod != &None {
 		extraNewArgs, raised := getNewArgsMethod.Call(f, nil, nil)
 		if raised != nil {
 			return nil, raised
@@ -305,18 +305,18 @@ func objectReduceCommon(f *Frame, args Args) (*Object, *BaseException) {
 		}
 		newArgs = append(newArgs, toTupleUnsafe(extraNewArgs).elems...)
 	}
-	dict := None
+	dict := &None
 	if o.dict != nil {
 		dict = o.dict.ToObject()
 	}
 	// For proto >= 2 include list and dict items.
-	listItems := None
+	listItems := &None
 	if o.isInstance(ListType) {
 		if listItems, raised = Iter(f, o); raised != nil {
 			return nil, raised
 		}
 	}
-	dictItems := None
+	dictItems := &None
 	if o.isInstance(DictType) {
 		iterItems, raised := o.typ.mroLookup(f, NewStr("iteritems"))
 		if raised != nil {

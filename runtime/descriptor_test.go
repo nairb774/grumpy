@@ -21,7 +21,7 @@ import (
 func TestPropertyDelete(t *testing.T) {
 	dummy := newObject(ObjectType)
 	cases := []invokeTestCase{
-		{args: wrapArgs(newProperty(nil, nil, wrapFuncForTest(func(f *Frame, o *Object) (*Object, *BaseException) { return None, nil })), dummy), want: None},
+		{args: wrapArgs(newProperty(nil, nil, wrapFuncForTest(func(f *Frame, o *Object) (*Object, *BaseException) { return &None, nil })), dummy), want: &None},
 		{args: wrapArgs(newProperty(nil, nil, wrapFuncForTest(func(f *Frame, o *Object) (*Object, *BaseException) { return nil, f.RaiseType(ValueErrorType, "bar") })), dummy), wantExc: mustCreateException(ValueErrorType, "bar")},
 		{args: wrapArgs(newProperty(nil, nil, nil), dummy), wantExc: mustCreateException(AttributeErrorType, "can't delete attribute")},
 	}
@@ -56,10 +56,10 @@ func TestPropertyInit(t *testing.T) {
 		return newTestTuple(p.get, p.set, p.del).ToObject(), nil
 	})
 	cases := []invokeTestCase{
-		{want: NewTuple(None, None, None).ToObject()},
-		{args: wrapArgs("foo"), want: newTestTuple("foo", None, None).ToObject()},
-		{args: wrapArgs("foo", None), want: newTestTuple("foo", None, None).ToObject()},
-		{args: wrapArgs("foo", None, "bar"), want: newTestTuple("foo", None, "bar").ToObject()},
+		{want: NewTuple(&None, &None, &None).ToObject()},
+		{args: wrapArgs("foo"), want: newTestTuple("foo", &None, &None).ToObject()},
+		{args: wrapArgs("foo", &None), want: newTestTuple("foo", &None, &None).ToObject()},
+		{args: wrapArgs("foo", &None, "bar"), want: newTestTuple("foo", &None, "bar").ToObject()},
 		{args: wrapArgs(1, 2, 3, 4), wantExc: mustCreateException(TypeErrorType, "'__init__' requires 3 arguments")},
 	}
 	for _, cas := range cases {
@@ -72,7 +72,7 @@ func TestPropertyInit(t *testing.T) {
 func TestPropertySet(t *testing.T) {
 	dummy := newObject(ObjectType)
 	cases := []invokeTestCase{
-		{args: wrapArgs(newProperty(nil, wrapFuncForTest(func(_ *Frame, _, _ *Object) (*Object, *BaseException) { return None, nil }), nil), dummy, 123), want: None},
+		{args: wrapArgs(newProperty(nil, wrapFuncForTest(func(_ *Frame, _, _ *Object) (*Object, *BaseException) { return &None, nil }), nil), dummy, 123), want: &None},
 		{args: wrapArgs(newProperty(nil, wrapFuncForTest(func(f *Frame, _, _ *Object) (*Object, *BaseException) { return nil, f.RaiseType(ValueErrorType, "bar") }), nil), dummy, 123), wantExc: mustCreateException(ValueErrorType, "bar")},
 		{args: wrapArgs(newProperty(nil, nil, nil), dummy, 123), wantExc: mustCreateException(AttributeErrorType, "can't set attribute")},
 	}
@@ -98,7 +98,7 @@ func TestMakeStructFieldDescriptor(t *testing.T) {
 		return get.Call(f, wrapArgs(args[3], t), nil)
 	}).ToObject()
 	cases := []invokeTestCase{
-		{args: wrapArgs(ObjectType, "dict", "__dict__", newObject(ObjectType)), want: None},
+		{args: wrapArgs(ObjectType, "dict", "__dict__", newObject(ObjectType)), want: &None},
 		{args: wrapArgs(ObjectType, "dict", "__dict__", newBuiltinFunction("foo", func(*Frame, Args, KWArgs) (*Object, *BaseException) { return nil, nil })), want: NewDict().ToObject()},
 		{args: wrapArgs(IntType, "value", "value", 42), want: NewInt(42).ToObject()},
 		{args: wrapArgs(StrType, "value", "value", 42), wantExc: mustCreateException(TypeErrorType, "descriptor 'value' for 'str' objects doesn't apply to 'int' objects")},

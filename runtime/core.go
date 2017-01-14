@@ -338,7 +338,7 @@ func IsTrue(f *Frame, o *Object) (bool, *BaseException) {
 	switch o {
 	case True.ToObject():
 		return true, nil
-	case False.ToObject(), None:
+	case False.ToObject(), &None:
 		return false, nil
 	}
 	nonzero := o.typ.slots.NonZero
@@ -996,10 +996,10 @@ func compareDefault(f *Frame, v, w *Object) int {
 		}
 		return 1
 	}
-	if v == None {
+	if v == &None {
 		return -1
 	}
-	if w == None {
+	if w == &None {
 		return 1
 	}
 	// TODO: In default_3way_compare, the number type name is the empty

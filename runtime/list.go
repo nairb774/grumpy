@@ -160,7 +160,7 @@ func listAppend(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
 		return nil, raised
 	}
 	toListUnsafe(args[0]).Append(args[1])
-	return None, nil
+	return &None, nil
 }
 
 func listExtend(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
@@ -248,7 +248,7 @@ func listInsert(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
 	copy(l.elems[i+1:], elems[i:])
 	l.elems[i] = args[2]
 	l.mutex.Unlock()
-	return None, nil
+	return &None, nil
 }
 
 func listIter(f *Frame, o *Object) (*Object, *BaseException) {
@@ -361,7 +361,7 @@ func listReverse(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 		l.elems[i], l.elems[j] = l.elems[j], l.elems[i]
 	}
 	l.mutex.Unlock()
-	return None, nil
+	return &None, nil
 }
 
 func listSetItem(f *Frame, o, key, value *Object) *BaseException {
@@ -386,7 +386,7 @@ func listSort(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 	}
 	l := toListUnsafe(args[0])
 	l.Sort(f)
-	return None, nil
+	return &None, nil
 }
 
 func initListType(dict map[string]*Object) {

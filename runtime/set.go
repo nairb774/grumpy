@@ -81,7 +81,7 @@ func toSetUnsafe(o *Object) *Set {
 
 // Add inserts key into s. If key already exists then does nothing.
 func (s *Set) Add(f *Frame, key *Object) (bool, *BaseException) {
-	return s.dict.putItem(f, key, None)
+	return s.dict.putItem(f, key, &None)
 }
 
 // Contains returns true if key exists in s.
@@ -102,7 +102,7 @@ func (s *Set) ToObject() *Object {
 // Update inserts all elements in the iterable o into s.
 func (s *Set) Update(f *Frame, o *Object) *BaseException {
 	raised := seqForEach(f, o, func(key *Object) *BaseException {
-		if raised := s.dict.SetItem(f, key, None); raised != nil {
+		if raised := s.dict.SetItem(f, key, &None); raised != nil {
 			return raised
 		}
 		return nil
@@ -117,7 +117,7 @@ func setAdd(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 	if _, raised := toSetUnsafe(args[0]).Add(f, args[1]); raised != nil {
 		return nil, raised
 	}
-	return None, nil
+	return &None, nil
 }
 
 func setContains(f *Frame, seq, value *Object) (*Object, *BaseException) {
@@ -135,7 +135,7 @@ func setDiscard(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 	if _, raised := toSetUnsafe(args[0]).Remove(f, args[1]); raised != nil {
 		return nil, raised
 	}
-	return None, nil
+	return &None, nil
 }
 
 func setEq(f *Frame, v, w *Object) (*Object, *BaseException) {
@@ -161,7 +161,7 @@ func setInit(f *Frame, o *Object, args Args, _ KWArgs) (*Object, *BaseException)
 			return nil, raised
 		}
 	}
-	return None, nil
+	return &None, nil
 }
 
 func setIsSubset(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
@@ -218,7 +218,7 @@ func setRemove(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 	} else if !removed {
 		return nil, raiseKeyError(f, key)
 	}
-	return None, nil
+	return &None, nil
 }
 
 func setRepr(f *Frame, o *Object) (*Object, *BaseException) {
@@ -232,7 +232,7 @@ func setUpdate(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 	if raised := toSetUnsafe(args[0]).Update(f, args[1]); raised != nil {
 		return nil, raised
 	}
-	return None, nil
+	return &None, nil
 }
 
 func initSetType(dict map[string]*Object) {
@@ -342,7 +342,7 @@ func frozenSetNew(f *Frame, t *Type, args Args, _ KWArgs) (*Object, *BaseExcepti
 	s.dict = NewDict()
 	if argc == 1 {
 		raised := seqForEach(f, args[0], func(o *Object) *BaseException {
-			return s.dict.SetItem(f, o, None)
+			return s.dict.SetItem(f, o, &None)
 		})
 		if raised != nil {
 			return nil, raised

@@ -69,7 +69,7 @@ func TestFloatArithmeticOps(t *testing.T) {
 		{Mod, NewFloat(4.5).ToObject(), NewFloat(math.Inf(1)).ToObject(), NewFloat(4.5).ToObject(), nil},
 		{Mod, NewFloat(4.5).ToObject(), NewFloat(math.Inf(-1)).ToObject(), NewFloat(math.Inf(-1)).ToObject(), nil},
 		{Mod, NewFloat(math.Inf(1)).ToObject(), NewFloat(math.Inf(-1)).ToObject(), NewFloat(math.NaN()).ToObject(), nil},
-		{Mod, None, NewFloat(42).ToObject(), nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for %: 'NoneType' and 'float'")},
+		{Mod, &None, NewFloat(42).ToObject(), nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for %: 'NoneType' and 'float'")},
 		{Mod, NewFloat(-32.25).ToObject(), NewInt(0).ToObject(), nil, mustCreateException(ZeroDivisionErrorType, "float division or modulo by zero")},
 		{Mod, NewFloat(math.Inf(-1)).ToObject(), NewFloat(0).ToObject(), nil, mustCreateException(ZeroDivisionErrorType, "float division or modulo by zero")},
 		{Mod, NewInt(2).ToObject(), NewFloat(0).ToObject(), nil, mustCreateException(ZeroDivisionErrorType, "float division or modulo by zero")},
@@ -77,7 +77,7 @@ func TestFloatArithmeticOps(t *testing.T) {
 		{Mul, NewInt(-4).ToObject(), NewFloat(1.2).ToObject(), NewFloat(-4.8).ToObject(), nil},
 		{Mul, NewFloat(math.Inf(1)).ToObject(), NewInt(-5).ToObject(), NewFloat(math.Inf(-1)).ToObject(), nil},
 		{Mul, False.ToObject(), NewFloat(math.Inf(1)).ToObject(), NewFloat(math.NaN()).ToObject(), nil},
-		{Mul, None, NewFloat(1.5).ToObject(), nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for *: 'NoneType' and 'float'")},
+		{Mul, &None, NewFloat(1.5).ToObject(), nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for *: 'NoneType' and 'float'")},
 		{Pow, NewFloat(2.0).ToObject(), NewInt(10).ToObject(), NewFloat(1024.0).ToObject(), nil},
 		{Pow, NewFloat(2.0).ToObject(), NewFloat(-2.0).ToObject(), NewFloat(0.25).ToObject(), nil},
 		{Pow, newObject(ObjectType), NewFloat(2.0).ToObject(), nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for **: 'object' and 'float'")},
@@ -111,7 +111,7 @@ func TestFloatCompare(t *testing.T) {
 		{args: wrapArgs(0.0, 0), want: compareAllResultEq},
 		{args: wrapArgs(1, 0.9), want: compareAllResultGT},
 		{args: wrapArgs(0, 0.0), want: compareAllResultEq},
-		{args: wrapArgs(0.0, None), want: compareAllResultGT},
+		{args: wrapArgs(0.0, &None), want: compareAllResultGT},
 		{args: wrapArgs(math.Inf(+1), bigLongNumber), want: compareAllResultGT},
 	}
 	for _, cas := range cases {
@@ -208,9 +208,9 @@ func TestFloatNew(t *testing.T) {
 		{args: wrapArgs(strictEqType, newObject(badSlotType)), wantExc: mustCreateException(TypeErrorType, "__float__ returned non-float (type object)")},
 		{args: wrapArgs(), wantExc: mustCreateException(TypeErrorType, "'__new__' requires 1 arguments")},
 		{args: wrapArgs(IntType), wantExc: mustCreateException(TypeErrorType, "float.__new__(int): int is not a subtype of float")},
-		{args: wrapArgs(FloatType, 123, None), wantExc: mustCreateException(TypeErrorType, "'__new__' of 'float' requires 0 or 1 arguments")},
+		{args: wrapArgs(FloatType, 123, &None), wantExc: mustCreateException(TypeErrorType, "'__new__' of 'float' requires 0 or 1 arguments")},
 		{args: wrapArgs(FloatType, "foo"), wantExc: mustCreateException(ValueErrorType, "could not convert string to float: foo")},
-		{args: wrapArgs(FloatType, None), wantExc: mustCreateException(TypeErrorType, "float() argument must be a string or a number")},
+		{args: wrapArgs(FloatType, &None), wantExc: mustCreateException(TypeErrorType, "float() argument must be a string or a number")},
 	}
 	for _, cas := range cases {
 		switch got, match := checkInvokeResult(floatNew, cas.args, cas.want, cas.wantExc); match {

@@ -31,7 +31,7 @@ var (
 	NoneType = newSimpleType("NoneType", ObjectType)
 	// None is the singleton NoneType object representing the Python 'None'
 	// object.
-	None = &Object{typ: NoneType}
+	None = Object{typ: NoneType}
 	// NotImplementedType is the object representing the Python
 	// 'NotImplementedType' object.
 	NotImplementedType = newSimpleType("NotImplementedType", ObjectType)
@@ -204,7 +204,7 @@ func builtinMapFn(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 		return nil, raised
 	}
 	for _, tuple := range z {
-		if args[0] == None {
+		if args[0] == &None {
 			if argc == 2 {
 				result = append(result, tuple[0])
 			} else {
@@ -311,7 +311,7 @@ func builtinDir(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
 	o := args[0]
 	if o.dict != nil {
 		raised := seqForEach(f, o.dict.ToObject(), func(k *Object) *BaseException {
-			return d.SetItem(f, k, None)
+			return d.SetItem(f, k, &None)
 		})
 		if raised != nil {
 			return nil, raised
@@ -319,7 +319,7 @@ func builtinDir(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
 	}
 	for _, t := range o.typ.mro {
 		raised := seqForEach(f, t.dict.ToObject(), func(k *Object) *BaseException {
-			return d.SetItem(f, k, None)
+			return d.SetItem(f, k, &None)
 		})
 		if raised != nil {
 			return nil, raised
@@ -650,7 +650,7 @@ func init() {
 		"max":            newBuiltinFunction("max", builtinMax).ToObject(),
 		"min":            newBuiltinFunction("min", builtinMin).ToObject(),
 		"next":           newBuiltinFunction("next", builtinNext).ToObject(),
-		"None":           None,
+		"None":           &None,
 		"NotImplemented": NotImplemented,
 		"oct":            newBuiltinFunction("oct", builtinOct).ToObject(),
 		"open":           newBuiltinFunction("open", builtinOpen).ToObject(),
@@ -801,7 +801,7 @@ func zipLongest(f *Frame, args Args) ([][]*Object, *BaseException) {
 			if raised != nil {
 				if raised.isInstance(StopIterationType) {
 					iters[i] = nil
-					elems[i] = None
+					elems[i] = &None
 					continue
 				}
 				f.RestoreExc(nil, nil)

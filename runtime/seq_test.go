@@ -33,7 +33,7 @@ func TestSeqApply(t *testing.T) {
 	cases := []invokeTestCase{
 		{args: wrapArgs(NewTuple()), want: newTestTuple(NewTuple(), true).ToObject()},
 		{args: wrapArgs(newTestList("foo", "bar")), want: newTestTuple(newTestTuple("foo", "bar"), true).ToObject()},
-		{args: wrapArgs(newTestDict("foo", None)), want: newTestTuple(newTestTuple("foo"), false).ToObject()},
+		{args: wrapArgs(newTestDict("foo", &None)), want: newTestTuple(newTestTuple("foo"), false).ToObject()},
 		{args: wrapArgs(42), wantExc: mustCreateException(TypeErrorType, "'int' object is not iterable")},
 	}
 	for _, cas := range cases {

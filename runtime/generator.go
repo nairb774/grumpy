@@ -57,7 +57,7 @@ func (g *Generator) resume(f *Frame, sendValue *Object) (*Object, *BaseException
 	oldState := g.state
 	switch oldState {
 	case generatorStateCreated:
-		if sendValue != None {
+		if sendValue != &None {
 			raised = f.RaiseType(TypeErrorType, "can't send non-None value to a just-started generator")
 		} else {
 			g.state = generatorStateRunning
@@ -102,7 +102,7 @@ func generatorIter(f *Frame, o *Object) (*Object, *BaseException) {
 }
 
 func generatorNext(f *Frame, o *Object) (*Object, *BaseException) {
-	return toGeneratorUnsafe(o).resume(f, None)
+	return toGeneratorUnsafe(o).resume(f, &None)
 }
 
 func generatorSend(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {

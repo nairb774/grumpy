@@ -39,7 +39,7 @@ var BaseExceptionType = newBasisType("BaseException", reflect.TypeOf(BaseExcepti
 func baseExceptionInit(f *Frame, o *Object, args Args, kwargs KWArgs) (*Object, *BaseException) {
 	e := toBaseExceptionUnsafe(o)
 	e.args = NewTuple(args.makeCopy()...)
-	return None, nil
+	return &None, nil
 }
 
 func baseExceptionRepr(f *Frame, o *Object) (*Object, *BaseException) {

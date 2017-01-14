@@ -131,7 +131,7 @@ func fileInit(f *Frame, o *Object, args Args, _ KWArgs) (*Object, *BaseException
 	file.file = osFile
 	file.reader = bufio.NewReader(osFile)
 	file.univNewLine = strings.HasSuffix(mode, "U")
-	return None, nil
+	return &None, nil
 }
 
 func fileEnter(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
@@ -153,7 +153,7 @@ func fileExit(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 	if raised != nil {
 		return nil, raised
 	}
-	return None, nil
+	return &None, nil
 }
 
 func fileClose(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
@@ -169,7 +169,7 @@ func fileClose(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 		}
 	}
 	file.open = false
-	return None, nil
+	return &None, nil
 }
 
 func fileIter(f *Frame, o *Object) (*Object, *BaseException) {
@@ -305,7 +305,7 @@ func fileWrite(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 	if _, err := file.file.Write([]byte(toStrUnsafe(args[1]).Value())); err != nil {
 		return nil, f.RaiseType(IOErrorType, err.Error())
 	}
-	return None, nil
+	return &None, nil
 }
 
 func initFileType(dict map[string]*Object) {

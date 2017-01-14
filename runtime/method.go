@@ -50,7 +50,7 @@ func methodCall(f *Frame, callable *Object, args Args, kwargs KWArgs) (*Object, 
 	m := toMethodUnsafe(callable)
 	var methodArgs []*Object
 	argc := len(args)
-	if m.self == None {
+	if m.self == &None {
 		if argc < 1 {
 			format := "unbound method %s() must be called with %s instance as first argument (got nothing instead)"
 			return nil, f.RaiseType(TypeErrorType, fmt.Sprintf(format, m.name, m.class.Name()))
@@ -71,7 +71,7 @@ func methodCall(f *Frame, callable *Object, args Args, kwargs KWArgs) (*Object, 
 func methodRepr(f *Frame, o *Object) (*Object, *BaseException) {
 	m := toMethodUnsafe(o)
 	s := ""
-	if m.self == None {
+	if m.self == &None {
 		s = fmt.Sprintf("<unbound method %s.%s>", m.class.Name(), m.function.Name())
 	} else {
 		repr, raised := Repr(f, m.self)
