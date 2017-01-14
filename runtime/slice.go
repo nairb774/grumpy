@@ -42,7 +42,7 @@ func toSliceUnsafe(o *Object) *Slice {
 // for i := start; i != stop; i += step { ... }
 func (s *Slice) calcSlice(f *Frame, numElems int) (int, int, int, int, *BaseException) {
 	step := 1
-	if s.step != nil && s.step != None {
+	if s.step != nil && s.step != &None {
 		if s.step.typ.slots.Index == nil {
 			return 0, 0, 0, 0, f.RaiseType(TypeErrorType, errBadSliceIndex)
 		}
@@ -129,7 +129,7 @@ func sliceNew(f *Frame, t *Type, args Args, _ KWArgs) (*Object, *BaseException) 
 
 func sliceRepr(f *Frame, o *Object) (*Object, *BaseException) {
 	s := toSliceUnsafe(o)
-	elems := []*Object{None, s.stop, None}
+	elems := []*Object{&None, s.stop, &None}
 	if s.start != nil {
 		elems[0] = s.start
 	}
@@ -157,7 +157,7 @@ func initSliceType(map[string]*Object) {
 }
 
 func sliceClampIndex(f *Frame, index *Object, def, seqLen int) (int, *BaseException) {
-	if index == nil || index == None {
+	if index == nil || index == &None {
 		return def, nil
 	}
 	if index.typ.slots.Index == nil {
@@ -175,7 +175,7 @@ func sliceCompare(f *Frame, v *Slice, w *Object, cmp binaryOpFunc) (*Object, *Ba
 		return NotImplemented, nil
 	}
 	rhs := toSliceUnsafe(w)
-	elems1, elems2 := []*Object{None, v.stop, None}, []*Object{None, rhs.stop, None}
+	elems1, elems2 := []*Object{&None, v.stop, &None}, []*Object{&None, rhs.stop, &None}
 	if v.start != nil {
 		elems1[0] = v.start
 	}

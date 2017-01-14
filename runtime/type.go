@@ -378,7 +378,7 @@ func typeGetAttribute(f *Frame, o *Object, name *Str) (*Object, *BaseException) 
 	}
 	if attr != nil {
 		if get := attr.typ.slots.Get; get != nil {
-			return get.Fn(f, attr, None, t)
+			return get.Fn(f, attr, &None, t)
 		}
 		return attr, nil
 	}

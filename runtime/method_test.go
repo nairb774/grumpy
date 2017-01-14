@@ -27,13 +27,13 @@ func TestMethodCall(t *testing.T) {
 	arg1 := NewStr("abc").ToObject()
 	cases := []invokeTestCase{
 		{args: wrapArgs(NewMethod(foo, self, ObjectType)), want: NewTuple(self).ToObject()},
-		{args: wrapArgs(NewMethod(foo, None, ObjectType), self), want: NewTuple(self).ToObject()},
+		{args: wrapArgs(NewMethod(foo, &None, ObjectType), self), want: NewTuple(self).ToObject()},
 		{args: wrapArgs(NewMethod(foo, self, ObjectType), arg0, arg1), want: NewTuple(self, arg0, arg1).ToObject()},
-		{args: wrapArgs(NewMethod(foo, None, ObjectType), self, arg0, arg1), want: NewTuple(self, arg0, arg1).ToObject()},
+		{args: wrapArgs(NewMethod(foo, &None, ObjectType), self, arg0, arg1), want: NewTuple(self, arg0, arg1).ToObject()},
 		{args: wrapArgs(), wantExc: mustCreateException(TypeErrorType, "unbound method __call__() must be called with instancemethod instance as first argument (got nothing instead)")},
 		{args: wrapArgs(newObject(ObjectType)), wantExc: mustCreateException(TypeErrorType, "unbound method __call__() must be called with instancemethod instance as first argument (got object instance instead)")},
-		{args: wrapArgs(NewMethod(foo, None, IntType), newObject(ObjectType)), wantExc: mustCreateException(TypeErrorType, "unbound method foo() must be called with int instance as first argument (got object instance instead)")},
-		{args: wrapArgs(NewMethod(foo, None, IntType)), wantExc: mustCreateException(TypeErrorType, "unbound method foo() must be called with int instance as first argument (got nothing instead)")},
+		{args: wrapArgs(NewMethod(foo, &None, IntType), newObject(ObjectType)), wantExc: mustCreateException(TypeErrorType, "unbound method foo() must be called with int instance as first argument (got object instance instead)")},
+		{args: wrapArgs(NewMethod(foo, &None, IntType)), wantExc: mustCreateException(TypeErrorType, "unbound method foo() must be called with int instance as first argument (got nothing instead)")},
 	}
 	for _, cas := range cases {
 		if err := runInvokeMethodTestCase(MethodType, "__call__", &cas); err != "" {
@@ -43,9 +43,9 @@ func TestMethodCall(t *testing.T) {
 }
 
 func TestMethodStrRepr(t *testing.T) {
-	foo := newBuiltinFunction("foo", func(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) { return None, nil })
+	foo := newBuiltinFunction("foo", func(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) { return &None, nil })
 	cases := []invokeTestCase{
-		{args: wrapArgs(NewMethod(foo, None, StrType)), want: NewStr("<unbound method str.foo>").ToObject()},
+		{args: wrapArgs(NewMethod(foo, &None, StrType)), want: NewStr("<unbound method str.foo>").ToObject()},
 		{args: wrapArgs(NewMethod(foo, NewStr("wut").ToObject(), StrType)), want: NewStr("<bound method str.foo of 'wut'>").ToObject()},
 		{args: wrapArgs(NewMethod(foo, NewInt(123).ToObject(), TupleType)), want: NewStr("<bound method tuple.foo of 123>").ToObject()},
 	}

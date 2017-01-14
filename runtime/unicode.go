@@ -372,12 +372,12 @@ func unicodeStrip(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 		return nil, raised
 	}
 	s := toUnicodeUnsafe(args[0])
-	charsArg := None
+	charsArg := &None
 	if argc > 1 {
 		charsArg = args[1]
 	}
 	matchFunc := unicode.IsSpace
-	if charsArg != None {
+	if charsArg != &None {
 		chars, raised := unicodeCoerce(f, charsArg)
 		if raised != nil {
 			return nil, raised

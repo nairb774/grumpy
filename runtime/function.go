@@ -169,7 +169,7 @@ func staticMethodInit(f *Frame, o *Object, args Args, _ KWArgs) (*Object, *BaseE
 		return nil, raised
 	}
 	toStaticMethodUnsafe(o).callable = args[0]
-	return None, nil
+	return &None, nil
 }
 
 func initStaticMethodType(map[string]*Object) {
@@ -209,7 +209,7 @@ func classMethodInit(f *Frame, o *Object, args Args, _ KWArgs) (*Object, *BaseEx
 		return nil, raised
 	}
 	toClassMethodUnsafe(o).callable = args[0]
-	return None, nil
+	return &None, nil
 }
 
 func initClassMethodType(map[string]*Object) {

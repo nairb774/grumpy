@@ -32,9 +32,9 @@ func TestNewClass(t *testing.T) {
 		wantBasis reflect.Type
 		invokeTestCase
 	}{
-		{objectBasis, invokeTestCase{args: wrapArgs([]*Type{ObjectType}), want: None}},
-		{fooType.basis, invokeTestCase{args: wrapArgs([]*Type{fooType, StrType}), want: None}},
-		{fooType.basis, invokeTestCase{args: wrapArgs([]*Type{fooType, StrType, ObjectType}), want: None}},
+		{objectBasis, invokeTestCase{args: wrapArgs([]*Type{ObjectType}), want: &None}},
+		{fooType.basis, invokeTestCase{args: wrapArgs([]*Type{fooType, StrType}), want: &None}},
+		{fooType.basis, invokeTestCase{args: wrapArgs([]*Type{fooType, StrType, ObjectType}), want: &None}},
 		{nil, invokeTestCase{args: wrapArgs([]*Type{}), wantExc: mustCreateException(TypeErrorType, "class must have base classes")}},
 		{nil, invokeTestCase{args: wrapArgs([]*Type{BoolType, ObjectType}), wantExc: mustCreateException(TypeErrorType, "type 'bool' is not an acceptable base type")}},
 		{nil, invokeTestCase{args: wrapArgs([]*Type{IntType, StrType}), wantExc: mustCreateException(TypeErrorType, "class layout error")}},
@@ -235,9 +235,9 @@ func TestTypeCall(t *testing.T) {
 
 func TestNewWithSubclass(t *testing.T) {
 	cases := []invokeTestCase{
-		{args: wrapArgs(StrType, "abc"), want: None},
-		{args: wrapArgs(IntType, 3), want: None},
-		{args: wrapArgs(UnicodeType, "abc"), want: None},
+		{args: wrapArgs(StrType, "abc"), want: &None},
+		{args: wrapArgs(IntType, 3), want: &None},
+		{args: wrapArgs(UnicodeType, "abc"), want: &None},
 	}
 	simpleRepr := newBuiltinFunction("__repr__", func(_ *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 		return NewStr(fmt.Sprintf("%s object", args[0].typ.Name())).ToObject(), nil
@@ -311,7 +311,7 @@ func TestTypeGetAttribute(t *testing.T) {
 			return NewStr("got setter").ToObject(), nil
 		}).ToObject(),
 		"__set__": newBuiltinFunction("__set__", func(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
-			return None, nil
+			return &None, nil
 		}).ToObject(),
 	}))
 	setter := newObject(setterType)
@@ -396,7 +396,7 @@ func TestTypeNew(t *testing.T) {
 		{wantExc: mustCreateException(TypeErrorType, "'__new__' requires 1 arguments")},
 		{args: wrapArgs(TypeType), wantExc: mustCreateException(TypeErrorType, "type() takes 1 or 3 arguments")},
 		{args: wrapArgs(TypeType, "foo", newTestTuple(false), NewDict()), wantExc: mustCreateException(TypeErrorType, "not a valid base class: False")},
-		{args: wrapArgs(TypeType, None), want: NoneType.ToObject()},
+		{args: wrapArgs(TypeType, &None), want: NoneType.ToObject()},
 		{args: wrapArgs(fooMetaType, "Qux", newTestTuple(fooType, barType), NewDict()), wantExc: mustCreateException(TypeErrorType, "metaclass conflict: the metaclass of a derived class must a be a (non-strict) subclass of the metaclasses of all its bases")},
 		// Test that the metaclass of the result is the most derived
 		// metaclass of the bases. In this case that should be
@@ -432,7 +432,7 @@ func TestTypeNewResult(t *testing.T) {
 		}
 		return nil
 	})
-	if err := runInvokeTestCase(fun, &invokeTestCase{want: None}); err != "" {
+	if err := runInvokeTestCase(fun, &invokeTestCase{want: &None}); err != "" {
 		t.Error(err)
 	}
 }
@@ -473,7 +473,7 @@ func TestTypeModule(t *testing.T) {
 		if raised != nil || mod != nil {
 			return mod, raised
 		}
-		return None, nil
+		return &None, nil
 	}).ToObject()
 	fooType := newTestClass("Foo", []*Type{ObjectType}, newTestDict("__module__", "foo.bar"))
 	barType := newTestClass("Bar", []*Type{ObjectType}, NewDict())

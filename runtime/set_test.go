@@ -159,7 +159,7 @@ func TestSetIsTrue(t *testing.T) {
 	for _, typ := range []*Type{SetType, FrozenSetType} {
 		cases := []invokeTestCase{
 			{args: wrapArgs(mustNotRaise(typ.Call(f, nil, nil))), want: False.ToObject()},
-			{args: wrapArgs(mustNotRaise(typ.Call(f, wrapArgs(newTestTuple("foo", None)), nil))), want: True.ToObject()},
+			{args: wrapArgs(mustNotRaise(typ.Call(f, wrapArgs(newTestTuple("foo", &None)), nil))), want: True.ToObject()},
 		}
 		for _, cas := range cases {
 			if err := runInvokeTestCase(wrapFuncForTest(IsTrue), &cas); err != "" {
@@ -322,7 +322,7 @@ func newTestFrozenSet(elems ...interface{}) *FrozenSet {
 	}
 	d := NewDict()
 	for _, elem := range wrappedElems {
-		if raised := d.SetItem(f, elem, None); raised != nil {
+		if raised := d.SetItem(f, elem, &None); raised != nil {
 			panic(raised)
 		}
 	}

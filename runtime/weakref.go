@@ -74,7 +74,7 @@ func weakRefCall(f *Frame, callable *Object, args Args, _ KWArgs) (*Object, *Bas
 	o := r.get()
 	r.mutex.Unlock()
 	if o == nil {
-		o = None
+		o = &None
 	}
 	return o, nil
 }

@@ -525,7 +525,7 @@ func dictClear(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 	d.table = newDictTable(0)
 	d.incVersion()
 	d.mutex.Unlock(f)
-	return None, nil
+	return &None, nil
 }
 
 func dictContains(f *Frame, seq, value *Object) (*Object, *BaseException) {
@@ -569,7 +569,7 @@ func dictGet(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
 	}
 	item, raised := toDictUnsafe(args[0]).GetItem(f, args[1])
 	if raised == nil && item == nil {
-		item = None
+		item = &None
 		if argc > 2 {
 			item = args[2]
 		}
@@ -655,7 +655,7 @@ func dictInit(f *Frame, o *Object, args Args, kwargs KWArgs) (*Object, *BaseExce
 			return nil, raised
 		}
 	}
-	return None, nil
+	return &None, nil
 }
 
 func dictIter(f *Frame, o *Object) (*Object, *BaseException) {
@@ -747,7 +747,7 @@ func dictUpdate(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
 			return nil, raised
 		}
 	}
-	return None, nil
+	return &None, nil
 }
 
 func dictValues(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {

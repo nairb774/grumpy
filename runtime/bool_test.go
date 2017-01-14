@@ -36,9 +36,9 @@ func TestBoolCompare(t *testing.T) {
 
 func TestBoolCreate(t *testing.T) {
 	cases := []invokeTestCase{
-		{args: wrapArgs(None), wantExc: mustCreateException(TypeErrorType, `'__new__' requires a 'type' object but received a "NoneType"`)},
+		{args: wrapArgs(&None), wantExc: mustCreateException(TypeErrorType, `'__new__' requires a 'type' object but received a "NoneType"`)},
 		{args: wrapArgs(BoolType), want: False.ToObject()},
-		{args: wrapArgs(BoolType, None), want: False.ToObject()},
+		{args: wrapArgs(BoolType, &None), want: False.ToObject()},
 		{args: wrapArgs(BoolType, ""), want: False.ToObject()},
 		{args: wrapArgs(BoolType, true), want: True.ToObject()},
 		{args: wrapArgs(BoolType, newObject(ObjectType)), want: True.ToObject()},

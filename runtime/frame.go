@@ -147,13 +147,13 @@ func (f *Frame) Raise(typ *Object, inst *Object, tb *Object) *BaseException {
 		}
 	}
 	if typ == nil {
-		typ = None
+		typ = &None
 	}
 	if inst == nil {
-		inst = None
+		inst = &None
 	}
 	if tb == nil {
-		tb = None
+		tb = &None
 	}
 	// Build the exception if necessary.
 	if typ.isInstance(TypeType) {
@@ -165,7 +165,7 @@ func (f *Frame) Raise(typ *Object, inst *Object, tb *Object) *BaseException {
 			var args Args
 			if inst.isInstance(TupleType) {
 				args = toTupleUnsafe(inst).elems
-			} else if inst != None {
+			} else if inst != &None {
 				args = []*Object{inst}
 			}
 			var raised *BaseException
@@ -173,7 +173,7 @@ func (f *Frame) Raise(typ *Object, inst *Object, tb *Object) *BaseException {
 				return raised
 			}
 		}
-	} else if inst == None {
+	} else if inst == &None {
 		inst = typ
 	} else {
 		return f.RaiseType(TypeErrorType, "instance exception may not have a separate value")
@@ -184,7 +184,7 @@ func (f *Frame) Raise(typ *Object, inst *Object, tb *Object) *BaseException {
 	}
 	e := toBaseExceptionUnsafe(inst)
 	var traceback *Traceback
-	if tb == None {
+	if tb == &None {
 		traceback = newTraceback(f, nil)
 	} else if tb.isInstance(TracebackType) {
 		traceback = toTracebackUnsafe(tb)
@@ -274,7 +274,7 @@ func frameExcInfo(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) 
 	if raised := checkMethodVarArgs(f, "__exc_info__", args, FrameType); raised != nil {
 		return nil, raised
 	}
-	excObj, tbObj := None, None
+	excObj, tbObj := &None, &None
 	e, tb := toFrameUnsafe(args[0]).ExcInfo()
 	if e != nil {
 		excObj = e.ToObject()

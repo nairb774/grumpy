@@ -215,7 +215,7 @@ func nativeFuncRepr(f *Frame, o *Object) (*Object, *BaseException) {
 }
 
 func initNativeFuncType(dict map[string]*Object) {
-	dict["__name__"] = newProperty(newBuiltinFunction("_get_name", nativeFuncGetName).ToObject(), None, None).ToObject()
+	dict["__name__"] = newProperty(newBuiltinFunction("_get_name", nativeFuncGetName).ToObject(), &None, &None).ToObject()
 	nativeFuncType.slots.Call = &callSlot{nativeFuncCall}
 	nativeFuncType.slots.Repr = &unaryOpSlot{nativeFuncRepr}
 }
@@ -286,7 +286,7 @@ func WrapNative(f *Frame, v reflect.Value) (*Object, *BaseException) {
 	switch v.Kind() {
 	case reflect.Interface:
 		if v.IsNil() {
-			return None, nil
+			return &None, nil
 		}
 		// Interfaces have undefined methods (Method() will return an
 		// invalid func value). What we really want to wrap is the
@@ -360,7 +360,7 @@ func WrapNative(f *Frame, v reflect.Value) (*Object, *BaseException) {
 	// specific cases which we handle below.
 	case reflect.Ptr:
 		if v.IsNil() {
-			return None, nil
+			return &None, nil
 		}
 		if v.Type() == reflect.TypeOf((*big.Int)(nil)) {
 			i := v.Interface().(*big.Int)
@@ -377,7 +377,7 @@ func WrapNative(f *Frame, v reflect.Value) (*Object, *BaseException) {
 		}
 	case reflect.Chan, reflect.Func, reflect.Map:
 		if v.IsNil() {
-			return None, nil
+			return &None, nil
 		}
 	}
 	return (&native{Object{typ: t}, v}).ToObject(), nil
@@ -467,7 +467,7 @@ func maybeConvertValue(f *Frame, o *Object, expectedRType reflect.Type) (reflect
 			return t.slots.Basis.Fn(o).Addr(), nil
 		}
 	}
-	if o == None {
+	if o == &None {
 		switch expectedRType.Kind() {
 		case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice, reflect.UnsafePointer:
 			return reflect.Zero(expectedRType), nil
@@ -571,7 +571,7 @@ func nativeInvoke(f *Frame, fun reflect.Value, args Args) (ret *Object, raised *
 	// returned, or to a Tuple, when many are returned.
 	switch numResults {
 	case 0:
-		ret = None
+		ret = &None
 	case 1:
 		ret, raised = WrapNative(f, result[0])
 	default:

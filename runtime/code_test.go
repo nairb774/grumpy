@@ -28,7 +28,7 @@ func TestNewCodeKeywordsCheck(t *testing.T) {
 	logFatal = func(msg string) {
 		got = msg
 	}
-	NewCode("foo", "foo.py", []Param{{"bar", None}, {"baz", nil}}, 0, nil)
+	NewCode("foo", "foo.py", []Param{{"bar", &None}, {"baz", nil}}, 0, nil)
 	if want := "foo() non-keyword arg baz after keyword arg"; got != want {
 		t.Errorf("NewCode logged %q, want %q", got, want)
 	}
@@ -58,15 +58,15 @@ func TestNewCode(t *testing.T) {
 		invokeTestCase{args: wrapArgs(NewCode("f3", "foo.py", []Param{{"a", nil}, {"b", nil}}, 0, fn), 1), kwargs: wrapKWArgs("b", "bear"), want: newTestTuple(1, "bear").ToObject()},
 		invokeTestCase{args: wrapArgs(NewCode("f3", "foo.py", []Param{{"a", nil}, {"b", nil}}, 0, fn)), kwargs: wrapKWArgs("b", "bear", "a", "apple"), want: newTestTuple("apple", "bear").ToObject()},
 		invokeTestCase{args: wrapArgs(NewCode("f3", "foo.py", []Param{{"a", nil}, {"b", nil}}, 0, fn), 1), kwargs: wrapKWArgs("a", "alpha"), wantExc: mustCreateException(TypeErrorType, "f3() got multiple values for keyword argument 'a'")},
-		invokeTestCase{args: wrapArgs(NewCode("f4", "foo.py", []Param{{"a", nil}, {"b", None}}, 0, fn), 123), want: newTestTuple(123, None).ToObject()},
-		invokeTestCase{args: wrapArgs(NewCode("f4", "foo.py", []Param{{"a", nil}, {"b", None}}, 0, fn), 123, "bar"), want: newTestTuple(123, "bar").ToObject()},
-		invokeTestCase{args: wrapArgs(NewCode("f4", "foo.py", []Param{{"a", nil}, {"b", None}}, 0, fn)), kwargs: wrapKWArgs("a", 123, "b", "bar"), want: newTestTuple(123, "bar").ToObject()},
+		invokeTestCase{args: wrapArgs(NewCode("f4", "foo.py", []Param{{"a", nil}, {"b", &None}}, 0, fn), 123), want: newTestTuple(123, &None).ToObject()},
+		invokeTestCase{args: wrapArgs(NewCode("f4", "foo.py", []Param{{"a", nil}, {"b", &None}}, 0, fn), 123, "bar"), want: newTestTuple(123, "bar").ToObject()},
+		invokeTestCase{args: wrapArgs(NewCode("f4", "foo.py", []Param{{"a", nil}, {"b", &None}}, 0, fn)), kwargs: wrapKWArgs("a", 123, "b", "bar"), want: newTestTuple(123, "bar").ToObject()},
 		invokeTestCase{args: wrapArgs(NewCode("f5", "foo.py", []Param{{"a", nil}}, CodeFlagVarArg, fn), 1), want: newTestTuple(1, NewTuple()).ToObject()},
 		invokeTestCase{args: wrapArgs(NewCode("f5", "foo.py", []Param{{"a", nil}}, CodeFlagVarArg, fn), 1, 2, 3), want: newTestTuple(1, newTestTuple(2, 3)).ToObject()},
 		invokeTestCase{args: wrapArgs(NewCode("f6", "foo.py", []Param{{"a", nil}}, CodeFlagKWArg, fn), "bar"), want: newTestTuple("bar", NewDict()).ToObject()},
 		invokeTestCase{args: wrapArgs(NewCode("f6", "foo.py", []Param{{"a", nil}}, CodeFlagKWArg, fn)), kwargs: wrapKWArgs("a", "apple", "b", "bear"), want: newTestTuple("apple", newTestDict("b", "bear")).ToObject()},
 		invokeTestCase{args: wrapArgs(NewCode("f6", "foo.py", []Param{{"a", nil}}, CodeFlagKWArg, fn), "bar"), kwargs: wrapKWArgs("b", "baz", "c", "qux"), want: newTestTuple("bar", newTestDict("b", "baz", "c", "qux")).ToObject()},
-		invokeTestCase{args: wrapArgs(NewCode("f7", "foo.py", nil, 0, nilFn)), want: None},
+		invokeTestCase{args: wrapArgs(NewCode("f7", "foo.py", nil, 0, nilFn)), want: &None},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(testFunc.ToObject(), &cas); err != "" {
@@ -85,7 +85,7 @@ func TestCodeEvalRestoreExc(t *testing.T) {
 		}
 		f.RestoreExc(nil, nil)
 		ranC1 = true
-		return None, nil
+		return &None, nil
 	})
 	c2 := NewCode("<c2>", "foo.py", nil, 0, func(f *Frame, _ []*Object) (*Object, *BaseException) {
 		f.RestoreExc(e, newTraceback(f, nil))
@@ -97,7 +97,7 @@ func TestCodeEvalRestoreExc(t *testing.T) {
 		}
 		f.RestoreExc(nil, nil)
 		ranC2 = true
-		return None, nil
+		return &None, nil
 	})
 	c2.Eval(NewRootFrame(), globals, nil, nil)
 	if !ranC1 {

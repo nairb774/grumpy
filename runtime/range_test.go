@@ -65,7 +65,7 @@ func TestRangeIteratorIter(t *testing.T) {
 		}
 		return nil
 	})
-	if err := runInvokeTestCase(fun, &invokeTestCase{want: None}); err != "" {
+	if err := runInvokeTestCase(fun, &invokeTestCase{want: &None}); err != "" {
 		t.Error(err)
 	}
 }

@@ -101,14 +101,14 @@ var (
 
 func systemExitInit(f *Frame, o *Object, args Args, kwargs KWArgs) (*Object, *BaseException) {
 	baseExceptionInit(f, o, args, kwargs)
-	code := None
+	code := &None
 	if len(args) > 0 {
 		code = args[0]
 	}
 	if raised := SetAttr(f, o, NewStr("code"), code); raised != nil {
 		return nil, raised
 	}
-	return None, nil
+	return &None, nil
 }
 
 func initSystemExitType(map[string]*Object) {

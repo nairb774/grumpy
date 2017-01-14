@@ -38,13 +38,13 @@ func TestAssert(t *testing.T) {
 		default:
 			return nil, f.RaiseType(SystemErrorType, fmt.Sprintf("Assert expected 1 or 2 args, got %d", argc))
 		}
-		return None, nil
+		return &None, nil
 	}).ToObject()
 	emptyAssert := toBaseExceptionUnsafe(mustNotRaise(AssertionErrorType.Call(NewRootFrame(), nil, nil)))
 	cases := []invokeTestCase{
-		{args: wrapArgs(true), want: None},
-		{args: wrapArgs(NewTuple(None)), want: None},
-		{args: wrapArgs(None), wantExc: emptyAssert},
+		{args: wrapArgs(true), want: &None},
+		{args: wrapArgs(NewTuple(&None)), want: &None},
+		{args: wrapArgs(&None), wantExc: emptyAssert},
 		{args: wrapArgs(NewDict()), wantExc: emptyAssert},
 		{args: wrapArgs(false, "foo"), wantExc: mustCreateException(AssertionErrorType, "foo")},
 	}
@@ -131,8 +131,8 @@ func TestBinaryOps(t *testing.T) {
 		{IOr, NewInt(9).ToObject(), NewInt(12).ToObject(), NewInt(13).ToObject(), nil},
 		{IOr, newObject(ObjectType), newObject(fooType), nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for |: 'object' and 'Foo'")},
 		{ISub, NewInt(3).ToObject(), NewInt(-3).ToObject(), NewInt(6).ToObject(), nil},
-		{ISub, newObject(inplaceType), None, None, nil},
-		{IXor, newObject(inplaceType), None, None, nil},
+		{ISub, newObject(inplaceType), &None, &None, nil},
+		{IXor, newObject(inplaceType), &None, &None, nil},
 		{IXor, NewInt(9).ToObject(), NewInt(12).ToObject(), NewInt(5).ToObject(), nil},
 		{IXor, newObject(ObjectType), newObject(fooType), nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for ^: 'object' and 'Foo'")},
 		{Mod, NewInt(24).ToObject(), NewInt(6).ToObject(), NewInt(0).ToObject(), nil},
@@ -260,8 +260,8 @@ func TestCompareDefault(t *testing.T) {
 		{args: wrapArgs(true, o1), want: compareAllResultLT},
 		{args: wrapArgs(o1, -306), want: compareAllResultGT},
 		{args: wrapArgs(-306, o1), want: compareAllResultLT},
-		{args: wrapArgs(NewList(), None), want: compareAllResultGT},
-		{args: wrapArgs(None, "foo"), want: compareAllResultLT},
+		{args: wrapArgs(NewList(), &None), want: compareAllResultGT},
+		{args: wrapArgs(&None, "foo"), want: compareAllResultLT},
 		{args: wrapArgs(o1, o1), want: compareAllResultEq},
 		{args: wrapArgs(o1, o2), want: compareAllResultLT},
 		{args: wrapArgs(o2, o1), want: compareAllResultGT},
@@ -285,7 +285,7 @@ func TestContains(t *testing.T) {
 		{args: wrapArgs(newTestDict(1, "foo", 2, "bar", 3, "baz"), 2), want: True.ToObject()},
 		{args: wrapArgs("foobar", "ooba"), want: True.ToObject()},
 		{args: wrapArgs("qux", "ooba"), want: False.ToObject()},
-		{args: wrapArgs(3.14, None), wantExc: mustCreateException(TypeErrorType, "'float' object is not iterable")},
+		{args: wrapArgs(3.14, &None), wantExc: mustCreateException(TypeErrorType, "'float' object is not iterable")},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(wrapFuncForTest(Contains), &cas); err != "" {
@@ -308,7 +308,7 @@ func TestDelItem(t *testing.T) {
 		return args[0], nil
 	}).ToObject()
 	cases := []invokeTestCase{
-		{args: wrapArgs(newTestDict("foo", None), "foo"), want: NewDict().ToObject()},
+		{args: wrapArgs(newTestDict("foo", &None), "foo"), want: NewDict().ToObject()},
 		{args: wrapArgs(NewDict(), "foo"), wantExc: mustCreateException(KeyErrorType, "foo")},
 		{args: wrapArgs(123, "bar"), wantExc: mustCreateException(TypeErrorType, "'int' object does not support item deletion")},
 	}
@@ -374,8 +374,8 @@ func TestGetAttr(t *testing.T) {
 	}))
 	cases := []invokeTestCase{
 		{args: wrapArgs(newObject(fooType), "bar"), want: fooResult},
-		{args: wrapArgs(newObject(fooType), "baz", None), want: fooResult},
-		{args: wrapArgs(newObject(ObjectType), "qux", None), want: None},
+		{args: wrapArgs(newObject(fooType), "baz", &None), want: fooResult},
+		{args: wrapArgs(newObject(ObjectType), "qux", &None), want: &None},
 		{args: wrapArgs(NewTuple(), "noexist"), wantExc: mustCreateException(AttributeErrorType, "'tuple' object has no attribute 'noexist'")},
 		{args: wrapArgs(DictType, "noexist"), wantExc: mustCreateException(AttributeErrorType, "type object 'dict' has no attribute 'noexist'")},
 		{args: wrapArgs(newObject(barType), "noexist"), wantExc: mustCreateException(TypeErrorType, "uh oh")},
@@ -389,7 +389,7 @@ func TestGetAttr(t *testing.T) {
 
 func TestGetItem(t *testing.T) {
 	cases := []invokeTestCase{
-		{args: wrapArgs(newStringDict(map[string]*Object{"foo": None}), "foo"), want: None},
+		{args: wrapArgs(newStringDict(map[string]*Object{"foo": &None}), "foo"), want: &None},
 		{args: wrapArgs(NewDict(), "bar"), wantExc: mustCreateException(KeyErrorType, "bar")},
 		{args: wrapArgs(true, "baz"), wantExc: mustCreateException(TypeErrorType, "'bool' object has no attribute '__getitem__'")},
 	}
@@ -449,7 +449,7 @@ func TestIndex(t *testing.T) {
 		{args: wrapArgs(newObject(longType)), want: NewLong(big.NewInt(123)).ToObject()},
 		{args: wrapArgs(newObject(raiseType)), wantExc: mustCreateException(RuntimeErrorType, "uh oh")},
 		{args: wrapArgs(newObject(badType)), wantExc: mustCreateException(TypeErrorType, "__index__ returned non-(int,long) (type float)")},
-		{args: wrapArgs("abc"), want: None},
+		{args: wrapArgs("abc"), want: &None},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(wrapFuncForTest(Index), &cas); err != "" {
@@ -493,15 +493,15 @@ func TestIsInstanceIsSubclass(t *testing.T) {
 	}{
 		{newObject(ObjectType), ObjectType.ToObject(), True.ToObject(), nil},
 		{NewInt(42).ToObject(), StrType.ToObject(), False.ToObject(), nil},
-		{None, NewTuple(NoneType.ToObject(), IntType.ToObject()).ToObject(), True.ToObject(), nil},
+		{&None, NewTuple(NoneType.ToObject(), IntType.ToObject()).ToObject(), True.ToObject(), nil},
 		{NewStr("foo").ToObject(), NewTuple(NoneType.ToObject(), IntType.ToObject()).ToObject(), False.ToObject(), nil},
 		{NewStr("foo").ToObject(), NewTuple(IntType.ToObject(), NoneType.ToObject()).ToObject(), False.ToObject(), nil},
-		{None, NewTuple().ToObject(), False.ToObject(), nil},
+		{&None, NewTuple().ToObject(), False.ToObject(), nil},
 		{newObject(barType), fooType.ToObject(), True.ToObject(), nil},
 		{newObject(barType), IntType.ToObject(), True.ToObject(), nil},
 		{newObject(fooType), IntType.ToObject(), False.ToObject(), nil},
-		{newObject(ObjectType), None, nil, mustCreateException(TypeErrorType, "classinfo must be a type or tuple of types")},
-		{newObject(ObjectType), NewTuple(None).ToObject(), nil, mustCreateException(TypeErrorType, "classinfo must be a type or tuple of types")},
+		{newObject(ObjectType), &None, nil, mustCreateException(TypeErrorType, "classinfo must be a type or tuple of types")},
+		{newObject(ObjectType), NewTuple(&None).ToObject(), nil, mustCreateException(TypeErrorType, "classinfo must be a type or tuple of types")},
 	}
 	for _, cas := range cases {
 		// IsInstance
@@ -516,7 +516,7 @@ func TestIsInstanceIsSubclass(t *testing.T) {
 		}
 	}
 	// Test that IsSubclass raises when first arg is not a type.
-	testCase := invokeTestCase{args: wrapArgs(None, NoneType), wantExc: mustCreateException(TypeErrorType, "issubclass() arg 1 must be a class")}
+	testCase := invokeTestCase{args: wrapArgs(&None, NoneType), wantExc: mustCreateException(TypeErrorType, "issubclass() arg 1 must be a class")}
 	if err := runInvokeTestCase(wrapFuncForTest(IsSubclass), &testCase); err != "" {
 		t.Error(err)
 	}
@@ -525,12 +525,12 @@ func TestIsInstanceIsSubclass(t *testing.T) {
 func TestIsTrue(t *testing.T) {
 	badNonZeroType := newTestClass("BadNonZeroType", []*Type{ObjectType}, newStringDict(map[string]*Object{
 		"__nonzero__": newBuiltinFunction("__nonzero__", func(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
-			return None, nil
+			return &None, nil
 		}).ToObject(),
 	}))
 	badLenType := newTestClass("BadLen", []*Type{ObjectType}, newStringDict(map[string]*Object{
 		"__len__": newBuiltinFunction("__len__", func(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
-			return None, nil
+			return &None, nil
 		}).ToObject(),
 	}))
 	cases := []invokeTestCase{
@@ -545,7 +545,7 @@ func TestIsTrue(t *testing.T) {
 		{args: wrapArgs(-1020), want: True.ToObject()},
 		{args: wrapArgs(1698391283), want: True.ToObject()},
 		// None
-		{args: wrapArgs(None), want: False.ToObject()},
+		{args: wrapArgs(&None), want: False.ToObject()},
 		// Object
 		{args: wrapArgs(newObject(ObjectType)), want: True.ToObject()},
 		// Str
@@ -554,7 +554,7 @@ func TestIsTrue(t *testing.T) {
 		{args: wrapArgs("foo"), want: True.ToObject()},
 		// Tuple
 		{args: wrapArgs(NewTuple()), want: False.ToObject()},
-		{args: wrapArgs(newTestTuple("foo", None)), want: True.ToObject()},
+		{args: wrapArgs(newTestTuple("foo", &None)), want: True.ToObject()},
 		// Funky types
 		{args: wrapArgs(newObject(badNonZeroType)), wantExc: mustCreateException(TypeErrorType, "__nonzero__ should return bool, returned NoneType")},
 		{args: wrapArgs(newObject(badLenType)), wantExc: mustCreateException(TypeErrorType, "an integer is required")},
@@ -639,14 +639,14 @@ func TestNext(t *testing.T) {
 func TestLen(t *testing.T) {
 	badLenType := newTestClass("BadLen", []*Type{ObjectType}, newStringDict(map[string]*Object{
 		"__len__": newBuiltinFunction("__len__", func(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
-			return None, nil
+			return &None, nil
 		}).ToObject(),
 	}))
 	cases := []invokeTestCase{
 		{args: wrapArgs(NewDict()), want: NewInt(0).ToObject()},
 		{args: wrapArgs(newStringDict(map[string]*Object{"foo": NewStr("foo value").ToObject(), "bar": NewStr("bar value").ToObject()})), want: NewInt(2).ToObject()},
 		{args: wrapArgs(NewTuple()), want: NewInt(0).ToObject()},
-		{args: wrapArgs(NewTuple(None, None, None)), want: NewInt(3).ToObject()},
+		{args: wrapArgs(NewTuple(&None, &None, &None)), want: NewInt(3).ToObject()},
 		{args: wrapArgs(10), wantExc: mustCreateException(TypeErrorType, "object of type 'int' has no len()")},
 		{args: wrapArgs(newObject(badLenType)), wantExc: mustCreateException(TypeErrorType, "an integer is required")},
 	}
@@ -711,7 +711,7 @@ func TestInvokeKeywordArgs(t *testing.T) {
 		return newStringDict(got).ToObject(), nil
 	}).ToObject()
 	d := NewDict()
-	d.SetItem(NewRootFrame(), NewInt(123).ToObject(), None)
+	d.SetItem(NewRootFrame(), NewInt(123).ToObject(), &None)
 	cases := []struct {
 		keywords KWArgs
 		kwargs   *Object
@@ -720,8 +720,8 @@ func TestInvokeKeywordArgs(t *testing.T) {
 	}{
 		{nil, nil, NewDict().ToObject(), nil},
 		{wrapKWArgs("foo", 42), nil, newTestDict("foo", 42).ToObject(), nil},
-		{nil, newTestDict("foo", None).ToObject(), newTestDict("foo", None).ToObject(), nil},
-		{wrapKWArgs("foo", 42), newTestDict("bar", None).ToObject(), newTestDict("foo", 42, "bar", None).ToObject(), nil},
+		{nil, newTestDict("foo", &None).ToObject(), newTestDict("foo", &None).ToObject(), nil},
+		{wrapKWArgs("foo", 42), newTestDict("bar", &None).ToObject(), newTestDict("foo", 42, "bar", &None).ToObject(), nil},
 		{nil, NewList().ToObject(), nil, mustCreateException(TypeErrorType, "argument after ** must be a dict, not list")},
 		{nil, d.ToObject(), nil, mustCreateException(TypeErrorType, "keywords must be strings")},
 	}
@@ -806,7 +806,7 @@ func TestReprMethodReturnsNonStr(t *testing.T) {
 	// case repr will raise.
 	typ := newTestClass("Foo", []*Type{ObjectType}, newStringDict(map[string]*Object{
 		"__repr__": newBuiltinFunction("__repr__", func(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
-			return None, nil
+			return &None, nil
 		}).ToObject(),
 	}))
 	_, raised := Repr(NewRootFrame(), newObject(typ))
@@ -905,7 +905,7 @@ func TestRichCompare(t *testing.T) {
 func TestCheckLocal(t *testing.T) {
 	o := newObject(ObjectType)
 	cases := []invokeTestCase{
-		{args: wrapArgs(o, "foo"), want: None},
+		{args: wrapArgs(o, "foo"), want: &None},
 		{args: wrapArgs(UnboundLocal, "bar"), wantExc: mustCreateException(UnboundLocalErrorType, "local variable 'bar' referenced before assignment")},
 	}
 	for _, cas := range cases {
@@ -927,8 +927,8 @@ func TestSetItem(t *testing.T) {
 		return o, nil
 	}).ToObject()
 	cases := []invokeTestCase{
-		{args: wrapArgs(NewDict(), "bar", None), want: newTestDict("bar", None).ToObject()},
-		{args: wrapArgs(123, "bar", None), wantExc: mustCreateException(TypeErrorType, "'int' object has no attribute '__setitem__'")},
+		{args: wrapArgs(NewDict(), "bar", &None), want: newTestDict("bar", &None).ToObject()},
+		{args: wrapArgs(123, "bar", &None), wantExc: mustCreateException(TypeErrorType, "'int' object has no attribute '__setitem__'")},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(setItem, &cas); err != "" {
@@ -941,7 +941,7 @@ func TestStartThread(t *testing.T) {
 	c := make(chan bool)
 	callable := newBuiltinFunction("TestStartThread", func(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
 		close(c)
-		return None, nil
+		return &None, nil
 	}).ToObject()
 	StartThread(callable)
 	// Deadlock indicates the thread didn't start.

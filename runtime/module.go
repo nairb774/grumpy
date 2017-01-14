@@ -196,7 +196,7 @@ func toModuleUnsafe(o *Object) *Module {
 // GetFilename returns the __file__ attribute of m, raising SystemError if it
 // does not exist.
 func (m *Module) GetFilename(f *Frame) (*Str, *BaseException) {
-	fileAttr, raised := GetAttr(f, m.ToObject(), NewStr("__file__"), None)
+	fileAttr, raised := GetAttr(f, m.ToObject(), NewStr("__file__"), &None)
 	if raised != nil {
 		return nil, raised
 	}
@@ -209,7 +209,7 @@ func (m *Module) GetFilename(f *Frame) (*Str, *BaseException) {
 // GetName returns the __name__ attribute of m, raising SystemError if it does
 // not exist.
 func (m *Module) GetName(f *Frame) (*Str, *BaseException) {
-	nameAttr, raised := GetAttr(f, m.ToObject(), NewStr("__name__"), None)
+	nameAttr, raised := GetAttr(f, m.ToObject(), NewStr("__name__"), &None)
 	if raised != nil {
 		return nil, raised
 	}
@@ -241,7 +241,7 @@ func moduleInit(f *Frame, o *Object, args Args, _ KWArgs) (*Object, *BaseExcepti
 			return nil, raised
 		}
 	}
-	return None, nil
+	return &None, nil
 }
 
 func moduleRepr(f *Frame, o *Object) (*Object, *BaseException) {
@@ -311,7 +311,7 @@ func RunMain(code *Code) int {
 	if o.isInstance(IntType) {
 		return toIntUnsafe(o).Value()
 	}
-	if o == None {
+	if o == &None {
 		return 0
 	}
 	if s, raised := ToStr(f, o); raised == nil {

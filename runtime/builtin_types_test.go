@@ -27,12 +27,12 @@ func TestBuiltinFuncs(t *testing.T) {
 	f := NewRootFrame()
 	objectDir := ObjectType.dict.Keys(f)
 	objectDir.Sort(f)
-	fooType := newTestClass("Foo", []*Type{ObjectType}, newStringDict(map[string]*Object{"bar": None}))
+	fooType := newTestClass("Foo", []*Type{ObjectType}, newStringDict(map[string]*Object{"bar": &None}))
 	fooTypeDir := NewList(objectDir.elems...)
 	fooTypeDir.Append(NewStr("bar").ToObject())
 	fooTypeDir.Sort(f)
 	foo := newObject(fooType)
-	SetAttr(f, foo, NewStr("baz"), None)
+	SetAttr(f, foo, NewStr("baz"), &None)
 	fooDir := NewList(fooTypeDir.elems...)
 	fooDir.Append(NewStr("baz").ToObject())
 	fooDir.Sort(f)
@@ -131,8 +131,8 @@ func TestBuiltinFuncs(t *testing.T) {
 		{f: "dir", args: wrapArgs(newObject(fooType)), want: fooTypeDir.ToObject()},
 		{f: "dir", args: wrapArgs(foo), want: fooDir.ToObject()},
 		{f: "dir", args: wrapArgs(), wantExc: mustCreateException(TypeErrorType, "'dir' requires 1 arguments")},
-		{f: "getattr", args: wrapArgs(None, NewStr("foo").ToObject(), NewStr("bar").ToObject()), want: NewStr("bar").ToObject()},
-		{f: "getattr", args: wrapArgs(None, NewStr("foo").ToObject()), wantExc: mustCreateException(AttributeErrorType, "'NoneType' object has no attribute 'foo'")},
+		{f: "getattr", args: wrapArgs(&None, NewStr("foo").ToObject(), NewStr("bar").ToObject()), want: NewStr("bar").ToObject()},
+		{f: "getattr", args: wrapArgs(&None, NewStr("foo").ToObject()), wantExc: mustCreateException(AttributeErrorType, "'NoneType' object has no attribute 'foo'")},
 		{f: "hasattr", args: wrapArgs(newObject(ObjectType), NewStr("foo").ToObject()), want: False.ToObject()},
 		{f: "hasattr", args: wrapArgs(foo, NewStr("bar").ToObject()), want: True.ToObject()},
 		{f: "hasattr", args: wrapArgs(foo, NewStr("baz").ToObject()), want: True.ToObject()},
@@ -166,12 +166,12 @@ func TestBuiltinFuncs(t *testing.T) {
 		{f: "len", args: wrapArgs(), wantExc: mustCreateException(TypeErrorType, "'len' requires 1 arguments")},
 		{f: "map", args: wrapArgs(), wantExc: mustCreateException(TypeErrorType, "map() requires at least two args")},
 		{f: "map", args: wrapArgs(StrType), wantExc: mustCreateException(TypeErrorType, "map() requires at least two args")},
-		{f: "map", args: wrapArgs(None, newTestList()), want: newTestList().ToObject()},
-		{f: "map", args: wrapArgs(None, newTestList(1, 2, 3)), want: newTestList(1, 2, 3).ToObject()},
-		{f: "map", args: wrapArgs(None, newTestDict("foo", 1, "bar", 3)), want: newTestList("foo", "bar").ToObject()},
-		{f: "map", args: wrapArgs(None, None), wantExc: mustCreateException(TypeErrorType, "'NoneType' object is not iterable")},
-		{f: "map", args: wrapArgs(StrType, None), wantExc: mustCreateException(TypeErrorType, "'NoneType' object is not iterable")},
-		{f: "map", args: wrapArgs(StrType, newTestList(), None), wantExc: mustCreateException(TypeErrorType, "'NoneType' object is not iterable")},
+		{f: "map", args: wrapArgs(&None, newTestList()), want: newTestList().ToObject()},
+		{f: "map", args: wrapArgs(&None, newTestList(1, 2, 3)), want: newTestList(1, 2, 3).ToObject()},
+		{f: "map", args: wrapArgs(&None, newTestDict("foo", 1, "bar", 3)), want: newTestList("foo", "bar").ToObject()},
+		{f: "map", args: wrapArgs(&None, &None), wantExc: mustCreateException(TypeErrorType, "'NoneType' object is not iterable")},
+		{f: "map", args: wrapArgs(StrType, &None), wantExc: mustCreateException(TypeErrorType, "'NoneType' object is not iterable")},
+		{f: "map", args: wrapArgs(StrType, newTestList(), &None), wantExc: mustCreateException(TypeErrorType, "'NoneType' object is not iterable")},
 		{f: "map", args: wrapArgs(newTestList(), newTestList(1, 2, 3)), wantExc: mustCreateException(TypeErrorType, "'list' object is not callable")},
 		{f: "map", args: wrapArgs(StrType, newTestList()), want: newTestList().ToObject()},
 		{f: "map", args: wrapArgs(StrType, newTestList(1, 2, 3)), want: newTestList("1", "2", "3").ToObject()},
@@ -287,10 +287,10 @@ func TestBuiltinFuncs(t *testing.T) {
 
 func TestBuiltinGlobals(t *testing.T) {
 	f := NewRootFrame()
-	f.globals = newTestDict("foo", 1, "bar", 2, 42, None)
+	f.globals = newTestDict("foo", 1, "bar", 2, 42, &None)
 	globals := mustNotRaise(Builtins.GetItemString(f, "globals"))
 	got, raised := globals.Call(f, nil, nil)
-	want := newTestDict("foo", 1, "bar", 2, 42, None).ToObject()
+	want := newTestDict("foo", 1, "bar", 2, 42, &None).ToObject()
 	switch checkResult(got, want, raised, nil) {
 	case checkInvokeResultExceptionMismatch:
 		t.Errorf("globals() = %v, want %v", got, want)
@@ -300,7 +300,7 @@ func TestBuiltinGlobals(t *testing.T) {
 }
 
 func TestNoneRepr(t *testing.T) {
-	cas := invokeTestCase{args: wrapArgs(None), want: NewStr("None").ToObject()}
+	cas := invokeTestCase{args: wrapArgs(&None), want: NewStr("None").ToObject()}
 	if err := runInvokeMethodTestCase(NoneType, "__repr__", &cas); err != "" {
 		t.Error(err)
 	}

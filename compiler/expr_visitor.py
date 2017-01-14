@@ -283,7 +283,7 @@ class ExprVisitor(ast.NodeVisitor):
 
   def visit_Slice(self, node):
     result = self.block.alloc_temp()
-    lower = upper = step = expr.GeneratedLiteral('πg.None')
+    lower = upper = step = expr.GeneratedLiteral('&πg.None')
     if node.lower:
       lower = self.visit(node.lower)
     if node.upper:
@@ -342,7 +342,7 @@ class ExprVisitor(ast.NodeVisitor):
     if node.value:
       value = self.visit(node.value)
     else:
-      value = expr.GeneratedLiteral('πg.None')
+      value = expr.GeneratedLiteral('&πg.None')
     resume_label = self.block.genlabel(is_checkpoint=True)
     self.writer.write('πF.PushCheckpoint({})'.format(resume_label))
     self.writer.write('return {}, nil'.format(value.expr))

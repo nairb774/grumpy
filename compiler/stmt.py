@@ -626,7 +626,7 @@ class StatementVisitor(ast.NodeVisitor):
             \t\tcontinue
             \t}
             } else {
-            \tif $swallow_exc, πE = $exit_func.Call(πF, πg.Args{$mgr, πg.None, πg.None, πg.None}, nil); πE != nil {
+            \tif $swallow_exc, πE = $exit_func.Call(πF, πg.Args{$mgr, &πg.None, &πg.None, &πg.None}, nil); πE != nil {
             \t\tcontinue
             \t}
             }

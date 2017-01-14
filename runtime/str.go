@@ -578,7 +578,7 @@ func strSplit(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
 			if sep == "" {
 				return nil, f.RaiseType(ValueErrorType, "empty separator")
 			}
-		} else if arg1 != None {
+		} else if arg1 != &None {
 			return nil, f.RaiseType(TypeErrorType, "expected a str separator")
 		}
 	}
@@ -677,7 +677,7 @@ func strStripImpl(f *Frame, args Args, side stripSide) (*Object, *BaseException)
 		return nil, raised
 	}
 	s := toStrUnsafe(args[0])
-	charsArg := None
+	charsArg := &None
 	if argc > 1 {
 		charsArg = args[1]
 	}
@@ -691,7 +691,7 @@ func strStripImpl(f *Frame, args Args, side stripSide) (*Object, *BaseException)
 		return unicodeStrip(f, Args{u.ToObject(), charsArg}, nil)
 	case charsArg.isInstance(StrType):
 		chars = []byte(toStrUnsafe(charsArg).Value())
-	case charsArg == None:
+	case charsArg == &None:
 		chars = strASCIISpaces
 	default:
 		return nil, f.RaiseType(TypeErrorType, "strip arg must be None, str or unicode")

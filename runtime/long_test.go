@@ -149,7 +149,7 @@ func TestLongBinaryOps(t *testing.T) {
 		{Mod, 3, -7, NewLong(big.NewInt(-4)).ToObject(), nil},
 		{Mod, MaxInt, MinInt, NewLong(big.NewInt(-1)).ToObject(), nil},
 		{Mod, MinInt, MaxInt, NewLong(big.NewInt(int64(MaxInt) - 1)).ToObject(), nil},
-		{Mod, None, 4, nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for %: 'NoneType' and 'long'")},
+		{Mod, &None, 4, nil, mustCreateException(TypeErrorType, "unsupported operand type(s) for %: 'NoneType' and 'long'")},
 		{Mod, 10, 0, nil, mustCreateException(ZeroDivisionErrorType, "integer division or modulo by zero")},
 		{Mod, MinInt, 1, NewLong(big.NewInt(0)).ToObject(), nil},
 		{Mul, 1, 3, NewLong(big.NewInt(3)).ToObject(), nil},
