@@ -27,7 +27,7 @@ var (
 	DictType             = newBasisType("dict", reflect.TypeOf(Dict{}), toDictUnsafe, ObjectType)
 	dictItemIteratorType = newBasisType("dictionary-itemiterator", reflect.TypeOf(dictItemIterator{}), toDictItemIteratorUnsafe, ObjectType)
 	dictKeyIteratorType  = newBasisType("dictionary-keyiterator", reflect.TypeOf(dictKeyIterator{}), toDictKeyIteratorUnsafe, ObjectType)
-	deletedEntry         = &dictEntry{}
+	deletedEntry         = dictEntry{}
 )
 
 const (
@@ -134,7 +134,7 @@ func (t *dictTable) lookupEntry(f *Frame, hash int, key *Object) (int, *dictEntr
 			}
 			break
 		}
-		if entry == deletedEntry {
+		if entry == &deletedEntry {
 			if free == -1 {
 				free = index
 			}
@@ -164,7 +164,7 @@ func (t *dictTable) lookupEntry(f *Frame, hash int, key *Object) (int, *dictEntr
 // remains unchanged. When a sufficiently sized table cannot be created, false
 // will be returned for the second value, otherwise true will be returned.
 func (t *dictTable) writeEntry(f *Frame, index int, entry *dictEntry) (*dictTable, bool) {
-	if t.entries[index] == deletedEntry {
+	if t.entries[index] == &deletedEntry {
 		t.storeEntry(index, entry)
 		t.incUsed(1)
 		return nil, true
@@ -191,7 +191,7 @@ func (t *dictTable) writeEntry(f *Frame, index int, entry *dictEntry) (*dictTabl
 	}
 	newTable := newDictTable(n)
 	for _, oldEntry := range t.entries {
-		if oldEntry != nil && oldEntry != deletedEntry {
+		if oldEntry != nil && oldEntry != &deletedEntry {
 			newTable.insertAbsentEntry(oldEntry)
 		}
 	}
@@ -228,7 +228,7 @@ func (iter *dictEntryIterator) next() *dictEntry {
 			break
 		}
 		entry = iter.table.loadEntry(index)
-		if entry == deletedEntry {
+		if entry == &deletedEntry {
 			entry = nil
 		}
 	}
@@ -328,8 +328,8 @@ func (d *Dict) DelItem(f *Frame, key *Object) (bool, *BaseException) {
 	if index, entry, raised := d.table.lookupEntry(f, hash.Value(), key); raised == nil {
 		if v != d.version {
 			raised = f.RaiseType(RuntimeErrorType, "dictionary changed during write")
-		} else if entry != nil && entry != deletedEntry {
-			d.table.storeEntry(index, deletedEntry)
+		} else if entry != nil && entry != &deletedEntry {
+			d.table.storeEntry(index, &deletedEntry)
 			d.table.incUsed(-1)
 			d.incVersion()
 			deleted = true
@@ -356,7 +356,7 @@ func (d *Dict) GetItem(f *Frame, key *Object) (*Object, *BaseException) {
 	if raised != nil {
 		return nil, raised
 	}
-	if entry != nil && entry != deletedEntry {
+	if entry != nil && entry != &deletedEntry {
 		return entry.value, nil
 	}
 	return nil, nil
@@ -374,7 +374,7 @@ func (d *Dict) Keys(f *Frame) *List {
 	keys := make([]*Object, d.Len())
 	i := 0
 	for _, entry := range d.table.entries {
-		if entry != nil && entry != deletedEntry {
+		if entry != nil && entry != &deletedEntry {
 			keys[i] = entry.key
 			i++
 		}
@@ -412,7 +412,7 @@ func (d *Dict) putItem(f *Frame, key, value *Object) (bool, *BaseException) {
 				}
 				d.incVersion()
 				// Key absent if entry == nil or deletedEntry.
-				added = entry == nil || entry == deletedEntry
+				added = entry == nil || entry == &deletedEntry
 			} else {
 				raised = f.RaiseType(OverflowErrorType, errResultTooLarge)
 			}
