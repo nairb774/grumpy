@@ -45,8 +45,9 @@ type Type struct {
 }
 
 var basisTypes = map[reflect.Type]*Type{
-	objectBasis: ObjectType,
-	typeBasis:   TypeType,
+	objectBasis:     ObjectType,
+	typeBasis:       TypeType,
+	TupleType.basis: &TupleType,
 }
 
 // newClass creates a Python type with the given name, base classes and type
@@ -402,7 +403,7 @@ func typeNew(f *Frame, t *Type, args Args, kwargs KWArgs) (*Object, *BaseExcepti
 		return args[0].typ.ToObject(), nil
 	}
 	// case 3+
-	if raised := checkMethodArgs(f, "__new__", args, StrType, TupleType, DictType); raised != nil {
+	if raised := checkMethodArgs(f, "__new__", args, StrType, &TupleType, DictType); raised != nil {
 		return nil, raised
 	}
 	name := toStrUnsafe(args[0]).Value()

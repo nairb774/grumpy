@@ -299,7 +299,7 @@ func objectReduceCommon(f *Frame, args Args) (*Object, *BaseException) {
 		if raised != nil {
 			return nil, raised
 		}
-		if !extraNewArgs.isInstance(TupleType) {
+		if !extraNewArgs.isInstance(&TupleType) {
 			format := "__getnewargs__ should return a tuple, not '%s'"
 			return nil, f.RaiseType(TypeErrorType, fmt.Sprintf(format, extraNewArgs.Type().Name()))
 		}

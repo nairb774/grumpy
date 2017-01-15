@@ -146,7 +146,7 @@ var builtinTypes = map[*Type]*builtinTypeInfo{
 	SystemErrorType:               {global: true},
 	SystemExitType:                {global: true, init: initSystemExitType},
 	TracebackType:                 {init: initTracebackType},
-	TupleType:                     {init: initTupleType, global: true},
+	&TupleType:                    {init: initTupleType, global: true},
 	TypeErrorType:                 {global: true},
 	TypeType:                      {init: initTypeType, global: true},
 	UnboundLocalErrorType:         {global: true},

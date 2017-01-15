@@ -162,7 +162,7 @@ func TestFrameRaiseType(t *testing.T) {
 	cases := []invokeTestCase{
 		{args: wrapArgs(TypeErrorType, "bar"), wantExc: mustCreateException(TypeErrorType, "bar")},
 		{args: wrapArgs(ExceptionType, ""), wantExc: toBaseExceptionUnsafe(mustNotRaise(ExceptionType.Call(NewRootFrame(), wrapArgs(""), nil)))},
-		{args: wrapArgs(TupleType, "foo"), wantExc: mustCreateException(TypeErrorType, `exceptions must be derived from BaseException, not "tuple"`)},
+		{args: wrapArgs(&TupleType, "foo"), wantExc: mustCreateException(TypeErrorType, `exceptions must be derived from BaseException, not "tuple"`)},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(fun, &cas); err != "" {

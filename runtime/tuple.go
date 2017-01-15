@@ -32,7 +32,7 @@ func NewTuple(elems ...*Object) *Tuple {
 	if len(elems) == 0 {
 		return &emptyTuple
 	}
-	return &Tuple{Object: Object{typ: TupleType}, elems: elems}
+	return &Tuple{Object: Object{typ: &TupleType}, elems: elems}
 }
 
 func toTupleUnsafe(o *Object) *Tuple {
@@ -56,12 +56,21 @@ func (t *Tuple) ToObject() *Object {
 }
 
 // TupleType is the object representing the Python 'tuple' type.
-var TupleType = newBasisType("tuple", reflect.TypeOf(Tuple{}), toTupleUnsafe, ObjectType)
+var TupleType = Type{ // var TupleType = newBasisType("tuple", reflect.TypeOf(Tuple{}), toTupleUnsafe, ObjectType)
+	Object: Object{typ: TypeType},
+	name:   "tuple",
+	basis:  reflect.TypeOf(Tuple{}),
+	bases:  []*Type{ObjectType},
+	flags:  typeFlagDefault,
+	slots: typeSlots{
+		Basis: &basisSlot{func(o *Object) reflect.Value { return reflect.ValueOf(toTupleUnsafe(o)).Elem() }},
+	},
+}
 
-var emptyTuple = Tuple{Object: Object{typ: TupleType}}
+var emptyTuple = Tuple{Object: Object{typ: &TupleType}}
 
 func tupleAdd(f *Frame, v, w *Object) (*Object, *BaseException) {
-	if !w.isInstance(TupleType) {
+	if !w.isInstance(&TupleType) {
 		return NotImplemented, nil
 	}
 	elems, raised := seqAdd(f, toTupleUnsafe(v).elems, toTupleUnsafe(w).elems)
@@ -96,7 +105,7 @@ func tupleGetItem(f *Frame, o, key *Object) (*Object, *BaseException) {
 }
 
 func tupleGetNewArgs(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
-	if raised := checkMethodArgs(f, "__getnewargs__", args, TupleType); raised != nil {
+	if raised := checkMethodArgs(f, "__getnewargs__", args, &TupleType); raised != nil {
 		return nil, raised
 	}
 	return NewTuple(args[0]).ToObject(), nil
@@ -196,7 +205,7 @@ func initTupleType(dict map[string]*Object) {
 }
 
 func tupleCompare(f *Frame, v *Tuple, w *Object, cmp binaryOpFunc) (*Object, *BaseException) {
-	if !w.isInstance(TupleType) {
+	if !w.isInstance(&TupleType) {
 		return NotImplemented, nil
 	}
 	return seqCompare(f, v.elems, toTupleUnsafe(w).elems, cmp)

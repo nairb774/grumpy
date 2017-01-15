@@ -319,7 +319,7 @@ func IsSubclass(f *Frame, o *Object, classinfo *Object) (bool, *BaseException) {
 	if classinfo.isInstance(TypeType) {
 		return t.isSubclass(toTypeUnsafe(classinfo)), nil
 	}
-	if !classinfo.isInstance(TupleType) {
+	if !classinfo.isInstance(&TupleType) {
 		return false, f.RaiseType(TypeErrorType, errorMsg)
 	}
 	for _, elem := range toTupleUnsafe(classinfo).elems {

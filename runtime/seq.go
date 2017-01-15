@@ -70,7 +70,7 @@ func seqApply(f *Frame, seq *Object, fun func([]*Object, bool) *BaseException) *
 		raised := fun(l.elems, true)
 		l.mutex.RUnlock()
 		return raised
-	case seq.isInstance(TupleType):
+	case seq.isInstance(&TupleType):
 		return fun(toTupleUnsafe(seq).elems, true)
 	default:
 		elems := []*Object{}

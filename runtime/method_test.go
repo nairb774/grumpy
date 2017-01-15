@@ -47,7 +47,7 @@ func TestMethodStrRepr(t *testing.T) {
 	cases := []invokeTestCase{
 		{args: wrapArgs(NewMethod(foo, &None, StrType)), want: NewStr("<unbound method str.foo>").ToObject()},
 		{args: wrapArgs(NewMethod(foo, NewStr("wut").ToObject(), StrType)), want: NewStr("<bound method str.foo of 'wut'>").ToObject()},
-		{args: wrapArgs(NewMethod(foo, NewInt(123).ToObject(), TupleType)), want: NewStr("<bound method tuple.foo of 123>").ToObject()},
+		{args: wrapArgs(NewMethod(foo, NewInt(123).ToObject(), &TupleType)), want: NewStr("<bound method tuple.foo of 123>").ToObject()},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(wrapFuncForTest(ToStr), &cas); err != "" {

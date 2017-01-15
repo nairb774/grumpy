@@ -660,7 +660,7 @@ func TestLen(t *testing.T) {
 func TestLenRaise(t *testing.T) {
 	testTypes := []*Type{
 		DictType,
-		TupleType,
+		&TupleType,
 	}
 	for _, typ := range testTypes {
 		cases := []invokeTestCase{
@@ -785,7 +785,7 @@ func TestReprRaise(t *testing.T) {
 		IntType,
 		FunctionType,
 		StrType,
-		TupleType,
+		&TupleType,
 		TypeType,
 	}
 	for _, typ := range testTypes {

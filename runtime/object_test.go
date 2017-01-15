@@ -235,7 +235,7 @@ func TestObjectReduce(t *testing.T) {
 			return nil, raised
 		}
 		msg := NewStr(fmt.Sprintf("reduce must return a tuple, got %s", result.Type().Name())).ToObject()
-		if raised := Assert(f, GetBool(result.isInstance(TupleType)).ToObject(), msg); raised != nil {
+		if raised := Assert(f, GetBool(result.isInstance(&TupleType)).ToObject(), msg); raised != nil {
 			return nil, raised
 		}
 		elems := toTupleUnsafe(result).elems
@@ -246,7 +246,7 @@ func TestObjectReduce(t *testing.T) {
 		}
 		newArgs := elems[1]
 		msg = NewStr(fmt.Sprintf("reduce second return value must be tuple, got %s", newArgs.Type().Name())).ToObject()
-		if raised := Assert(f, GetBool(newArgs.isInstance(TupleType)).ToObject(), msg); raised != nil {
+		if raised := Assert(f, GetBool(newArgs.isInstance(&TupleType)).ToObject(), msg); raised != nil {
 			return nil, raised
 		}
 		// Call the reconstructor function with the args returned.

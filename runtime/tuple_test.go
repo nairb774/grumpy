@@ -77,7 +77,7 @@ func TestTupleCompare(t *testing.T) {
 
 func TestTupleCompareNotImplemented(t *testing.T) {
 	cas := invokeTestCase{args: wrapArgs(NewTuple(), 3), want: NotImplemented}
-	if err := runInvokeMethodTestCase(TupleType, "__eq__", &cas); err != "" {
+	if err := runInvokeMethodTestCase(&TupleType, "__eq__", &cas); err != "" {
 		t.Error(err)
 	}
 }
@@ -96,7 +96,7 @@ func TestTupleContains(t *testing.T) {
 		{args: wrapArgs(newTestTuple(true), &None), want: False.ToObject()},
 	}
 	for _, cas := range cases {
-		if err := runInvokeMethodTestCase(TupleType, "__contains__", &cas); err != "" {
+		if err := runInvokeMethodTestCase(&TupleType, "__contains__", &cas); err != "" {
 			t.Error(err)
 		}
 	}
@@ -166,7 +166,7 @@ func TestTupleGetItem(t *testing.T) {
 		{args: wrapArgs(newTestTuple(true), &None), wantExc: mustCreateException(TypeErrorType, "sequence indices must be integers, not NoneType")},
 	}
 	for _, cas := range cases {
-		if err := runInvokeMethodTestCase(TupleType, "__getitem__", &cas); err != "" {
+		if err := runInvokeMethodTestCase(&TupleType, "__getitem__", &cas); err != "" {
 			t.Error(err)
 		}
 	}
@@ -208,7 +208,7 @@ func TestTupleStrRepr(t *testing.T) {
 	cases := []invokeTestCase{
 		{args: wrapArgs(NewTuple()), want: newTestTuple("()", "()").ToObject()},
 		{args: wrapArgs(newTestTuple("foo")), want: newTestTuple("('foo',)", "('foo',)").ToObject()},
-		{args: wrapArgs(newTestTuple(TupleType, ExceptionType)), want: newTestTuple("(<type 'tuple'>, <type 'Exception'>)", "(<type 'tuple'>, <type 'Exception'>)").ToObject()},
+		{args: wrapArgs(newTestTuple(&TupleType, ExceptionType)), want: newTestTuple("(<type 'tuple'>, <type 'Exception'>)", "(<type 'tuple'>, <type 'Exception'>)").ToObject()},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(fun, &cas); err != "" {

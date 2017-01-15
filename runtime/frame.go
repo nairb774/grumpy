@@ -138,7 +138,7 @@ func (f *Frame) Raise(typ *Object, inst *Object, tb *Object) *BaseException {
 		}
 		if !inst.isInstance(t) {
 			var args Args
-			if inst.isInstance(TupleType) {
+			if inst.isInstance(&TupleType) {
 				args = toTupleUnsafe(inst).elems
 			} else if inst != &None {
 				args = []*Object{inst}

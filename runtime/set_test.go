@@ -258,10 +258,10 @@ func TestSetStrRepr(t *testing.T) {
 	cases := []invokeTestCase{
 		{args: wrapArgs(NewSet()), want: NewStr("set([])").ToObject()},
 		{args: wrapArgs(newTestSet("foo")), want: NewStr("set(['foo'])").ToObject()},
-		{args: wrapArgs(newTestSet(TupleType, ExceptionType)), want: NewStr("set([<type 'tuple'>, <type 'Exception'>])").ToObject()},
+		{args: wrapArgs(newTestSet(&TupleType, ExceptionType)), want: NewStr("set([<type 'tuple'>, <type 'Exception'>])").ToObject()},
 		{args: wrapArgs(newTestFrozenSet()), want: NewStr("frozenset([])").ToObject()},
 		{args: wrapArgs(newTestFrozenSet("foo")), want: NewStr("frozenset(['foo'])").ToObject()},
-		{args: wrapArgs(newTestFrozenSet(TupleType, ExceptionType)), want: NewStr("frozenset([<type 'tuple'>, <type 'Exception'>])").ToObject()},
+		{args: wrapArgs(newTestFrozenSet(&TupleType, ExceptionType)), want: NewStr("frozenset([<type 'tuple'>, <type 'Exception'>])").ToObject()},
 	}
 	for _, cas := range cases {
 		if err := runInvokeTestCase(wrapFuncForTest(ToStr), &cas); err != "" {

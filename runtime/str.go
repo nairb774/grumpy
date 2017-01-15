@@ -387,7 +387,7 @@ func strMod(f *Frame, v, w *Object) (*Object, *BaseException) {
 	switch {
 	case w.isInstance(DictType):
 		return nil, f.RaiseType(NotImplementedErrorType, "mappings not yet supported")
-	case w.isInstance(TupleType):
+	case w.isInstance(&TupleType):
 		return strInterpolate(f, s, toTupleUnsafe(w))
 	default:
 		return strInterpolate(f, s, NewTuple(w))
@@ -774,7 +774,7 @@ func strStartsEndsWith(f *Frame, method string, args Args) (*Object, *BaseExcept
 	matchesArg := args[1]
 	var matches []string
 	switch {
-	case matchesArg.isInstance(TupleType):
+	case matchesArg.isInstance(&TupleType):
 		elems := toTupleUnsafe(matchesArg).elems
 		matches = make([]string, len(elems))
 		for i, o := range elems {

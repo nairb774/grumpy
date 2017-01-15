@@ -452,7 +452,7 @@ func TestTypeStrRepr(t *testing.T) {
 	fooType := newTestClass("Foo", []*Type{ObjectType}, newTestDict("__module__", "foo.bar"))
 	cases := []invokeTestCase{
 		{args: wrapArgs(TypeErrorType), want: newTestTuple("<type 'TypeError'>", "<type 'TypeError'>").ToObject()},
-		{args: wrapArgs(TupleType), want: newTestTuple("<type 'tuple'>", "<type 'tuple'>").ToObject()},
+		{args: wrapArgs(&TupleType), want: newTestTuple("<type 'tuple'>", "<type 'tuple'>").ToObject()},
 		{args: wrapArgs(TypeType), want: newTestTuple("<type 'type'>", "<type 'type'>").ToObject()},
 		{args: wrapArgs(fooType), want: newTestTuple("<type 'foo.bar.Foo'>", "<type 'foo.bar.Foo'>").ToObject()},
 		{args: wrapArgs(mustNotRaise(WrapNative(NewRootFrame(), reflect.ValueOf(t))).Type()), want: newTestTuple("<type '*T'>", "<type '*T'>").ToObject()},

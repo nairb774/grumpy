@@ -304,7 +304,7 @@ func TestListStrRepr(t *testing.T) {
 	cases := []invokeTestCase{
 		{args: wrapArgs(NewList()), want: NewStr("[]").ToObject()},
 		{args: wrapArgs(newTestList("foo")), want: NewStr("['foo']").ToObject()},
-		{args: wrapArgs(newTestList(TupleType, ExceptionType)), want: NewStr("[<type 'tuple'>, <type 'Exception'>]").ToObject()},
+		{args: wrapArgs(newTestList(&TupleType, ExceptionType)), want: NewStr("[<type 'tuple'>, <type 'Exception'>]").ToObject()},
 		{args: wrapArgs(recursiveList), want: NewStr("['foo', [...]]").ToObject()},
 	}
 	for _, cas := range cases {
