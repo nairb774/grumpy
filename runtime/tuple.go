@@ -30,7 +30,7 @@ type Tuple struct {
 // NewTuple returns a tuple containing the given elements.
 func NewTuple(elems ...*Object) *Tuple {
 	if len(elems) == 0 {
-		return emptyTuple
+		return &emptyTuple
 	}
 	return &Tuple{Object: Object{typ: TupleType}, elems: elems}
 }
@@ -58,7 +58,7 @@ func (t *Tuple) ToObject() *Object {
 // TupleType is the object representing the Python 'tuple' type.
 var TupleType = newBasisType("tuple", reflect.TypeOf(Tuple{}), toTupleUnsafe, ObjectType)
 
-var emptyTuple = &Tuple{Object: Object{typ: TupleType}}
+var emptyTuple = Tuple{Object: Object{typ: TupleType}}
 
 func tupleAdd(f *Frame, v, w *Object) (*Object, *BaseException) {
 	if !w.isInstance(TupleType) {
