@@ -13,6 +13,8 @@ asm_line = re.compile(
     r'(?P<ins>[A-Z.]+)'
     r'(?:\t(?P<args>.+))?')
 
+autotmp = re.compile(r'""\.autotmp_\d+(?=\+\d+\(SP\))')
+
 dump_line = re.compile(r'\t0x[\da-f]{4}(?: [\da-f]{2}){,16}(?:   ){,15}  .+')
 
 
@@ -58,7 +60,7 @@ class Ins(object):
     )
 
     if args:
-      args = tuple(args.split(', '))
+      args = args.split(', ')
     else:
       args = ()
 
@@ -66,7 +68,7 @@ class Ins(object):
       self.is_likely_jump = int(args[0][1])
       args = args[1:]
 
-    self.args = args
+    self.args = tuple(autotmp.sub("autotmp", a) for a in args)
 
     if not self.is_jump and self.ins.startswith('J'):
       try:
