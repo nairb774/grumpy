@@ -153,7 +153,7 @@ func unicodeEq(f *Frame, v, w *Object) (*Object, *BaseException) {
 }
 
 func unicodeGE(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return unicodeCompare(f, toUnicodeUnsafe(v), w, False, True, True)
+	return unicodeCompare(f, toUnicodeUnsafe(v), w, &False, &True, &True)
 }
 
 // unicodeGetItem returns a slice of string depending on whether index is an
@@ -194,7 +194,7 @@ func unicodeGetNewArgs(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) 
 }
 
 func unicodeGT(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return unicodeCompare(f, toUnicodeUnsafe(v), w, False, False, True)
+	return unicodeCompare(f, toUnicodeUnsafe(v), w, &False, &False, &True)
 }
 
 func unicodeHash(f *Frame, o *Object) (*Object, *BaseException) {
@@ -230,7 +230,7 @@ func unicodeJoin(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 }
 
 func unicodeLE(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return unicodeCompare(f, toUnicodeUnsafe(v), w, True, True, False)
+	return unicodeCompare(f, toUnicodeUnsafe(v), w, &True, &True, &False)
 }
 
 func unicodeLen(f *Frame, o *Object) (*Object, *BaseException) {
@@ -238,7 +238,7 @@ func unicodeLen(f *Frame, o *Object) (*Object, *BaseException) {
 }
 
 func unicodeLT(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return unicodeCompare(f, toUnicodeUnsafe(v), w, True, False, False)
+	return unicodeCompare(f, toUnicodeUnsafe(v), w, &True, &False, &False)
 }
 
 func unicodeMul(f *Frame, v, w *Object) (*Object, *BaseException) {

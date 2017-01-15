@@ -386,8 +386,8 @@ func TestStrMethods(t *testing.T) {
 		{"zfill", wrapArgs("34", 1), NewStr("34").ToObject(), nil},
 		{"zfill", wrapArgs("34", 4), NewStr("0034").ToObject(), nil},
 		{"zfill", wrapArgs("34", &None), nil, mustCreateException(TypeErrorType, "int() argument must be a string or a number, not 'NoneType'")},
-		{"zfill", wrapArgs("", True), NewStr("0").ToObject(), nil},
-		{"zfill", wrapArgs("", False), NewStr("").ToObject(), nil},
+		{"zfill", wrapArgs("", &True), NewStr("0").ToObject(), nil},
+		{"zfill", wrapArgs("", &False), NewStr("").ToObject(), nil},
 		{"zfill", wrapArgs("34", NewStr("test")), nil, mustCreateException(ValueErrorType, "invalid literal for int() with base 10: test")},
 		{"zfill", wrapArgs("34"), nil, mustCreateException(TypeErrorType, "'zfill' of 'str' requires 2 arguments")},
 	}

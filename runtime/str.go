@@ -202,7 +202,7 @@ func strEndsWith(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 }
 
 func strEq(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return strCompare(v, w, False, True, False), nil
+	return strCompare(v, w, &False, &True, &False), nil
 }
 
 // strFind returns the lowest index in s where the substring sub is found such
@@ -249,7 +249,7 @@ func strFind(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 }
 
 func strGE(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return strCompare(v, w, False, True, True), nil
+	return strCompare(v, w, &False, &True, &True), nil
 }
 
 // strGetItem returns a slice of string depending on whether index is an integer
@@ -293,7 +293,7 @@ func strGetNewArgs(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 }
 
 func strGT(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return strCompare(v, w, False, False, True), nil
+	return strCompare(v, w, &False, &False, &True), nil
 }
 
 func strHash(f *Frame, o *Object) (*Object, *BaseException) {
@@ -358,7 +358,7 @@ func strJoin(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 }
 
 func strLE(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return strCompare(v, w, True, True, False), nil
+	return strCompare(v, w, &True, &True, &False), nil
 }
 
 func strLen(f *Frame, o *Object) (*Object, *BaseException) {
@@ -379,7 +379,7 @@ func strLStrip(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 }
 
 func strLT(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return strCompare(v, w, True, False, False), nil
+	return strCompare(v, w, &True, &False, &False), nil
 }
 
 func strMod(f *Frame, v, w *Object) (*Object, *BaseException) {
@@ -411,7 +411,7 @@ func strNative(f *Frame, o *Object) (reflect.Value, *BaseException) {
 }
 
 func strNE(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return strCompare(v, w, True, False, True), nil
+	return strCompare(v, w, &True, &False, &True), nil
 }
 
 func strNew(f *Frame, t *Type, args Args, _ KWArgs) (*Object, *BaseException) {

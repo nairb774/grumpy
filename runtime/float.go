@@ -69,7 +69,7 @@ func floatDiv(f *Frame, v, w *Object) (*Object, *BaseException) {
 }
 
 func floatEq(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return floatCompare(toFloatUnsafe(v), w, False, True, False), nil
+	return floatCompare(toFloatUnsafe(v), w, &False, &True, &False), nil
 }
 
 func floatFloat(f *Frame, o *Object) (*Object, *BaseException) {
@@ -77,7 +77,7 @@ func floatFloat(f *Frame, o *Object) (*Object, *BaseException) {
 }
 
 func floatGE(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return floatCompare(toFloatUnsafe(v), w, False, True, True), nil
+	return floatCompare(toFloatUnsafe(v), w, &False, &True, &True), nil
 }
 
 func floatGetNewArgs(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
@@ -88,7 +88,7 @@ func floatGetNewArgs(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 }
 
 func floatGT(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return floatCompare(toFloatUnsafe(v), w, False, False, True), nil
+	return floatCompare(toFloatUnsafe(v), w, &False, &False, &True), nil
 }
 
 func floatInt(f *Frame, o *Object) (*Object, *BaseException) {
@@ -120,11 +120,11 @@ func floatLong(f *Frame, o *Object) (*Object, *BaseException) {
 }
 
 func floatLE(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return floatCompare(toFloatUnsafe(v), w, True, True, False), nil
+	return floatCompare(toFloatUnsafe(v), w, &True, &True, &False), nil
 }
 
 func floatLT(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return floatCompare(toFloatUnsafe(v), w, True, False, False), nil
+	return floatCompare(toFloatUnsafe(v), w, &True, &False, &False), nil
 }
 
 func floatMod(f *Frame, v, w *Object) (*Object, *BaseException) {
@@ -140,7 +140,7 @@ func floatNative(f *Frame, o *Object) (reflect.Value, *BaseException) {
 }
 
 func floatNE(f *Frame, v, w *Object) (*Object, *BaseException) {
-	return floatCompare(toFloatUnsafe(v), w, True, False, True), nil
+	return floatCompare(toFloatUnsafe(v), w, &True, &False, &True), nil
 }
 
 func floatNeg(f *Frame, o *Object) (*Object, *BaseException) {

@@ -22,9 +22,9 @@ import (
 // GetBool returns True if v is true, False otherwise.
 func GetBool(v bool) *Int {
 	if v {
-		return True
+		return &True
 	}
-	return False
+	return &False
 }
 
 // BoolType is the object representing the Python 'bool' type.
@@ -67,10 +67,10 @@ func initBoolType(map[string]*Object) {
 var (
 	// True is the singleton bool object representing the Python 'True'
 	// object.
-	True = &Int{Object{typ: BoolType}, 1}
+	True = Int{Object{typ: BoolType}, 1}
 	// False is the singleton bool object representing the Python 'False'
 	// object.
-	False    = &Int{Object{typ: BoolType}, 0}
+	False    = Int{Object{typ: BoolType}, 0}
 	trueStr  = NewStr("True").ToObject()
 	falseStr = NewStr("False").ToObject()
 )

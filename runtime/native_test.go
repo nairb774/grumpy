@@ -215,7 +215,7 @@ func TestWrapNative(t *testing.T) {
 		wantExc *BaseException
 	}{
 		{true, True.ToObject(), nil},
-		{True, True.ToObject(), nil},
+		{&True, True.ToObject(), nil},
 		{123, NewInt(123).ToObject(), nil},
 		{int8(10), NewInt(10).ToObject(), nil},
 		{float32(0.5), NewFloat(0.5).ToObject(), nil},

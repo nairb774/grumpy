@@ -310,7 +310,7 @@ func TestDictIter(t *testing.T) {
 	cases := []invokeTestCase{
 		{args: wrapArgs(NewDict()), want: NewTuple().ToObject()},
 		{args: wrapArgs(newStringDict(map[string]*Object{"foo": NewInt(1).ToObject(), "bar": NewInt(2).ToObject()})), want: newTestTuple("foo", "bar").ToObject()},
-		{args: wrapArgs(newTestDict(123, True, "foo", False)), want: newTestTuple(123, "foo").ToObject()},
+		{args: wrapArgs(newTestDict(123, &True, "foo", &False)), want: newTestTuple(123, "foo").ToObject()},
 		{args: wrapArgs(deletedItemDict), want: newTestTuple("foo").ToObject()},
 	}
 	for _, cas := range cases {
@@ -339,7 +339,7 @@ func TestDictItems(t *testing.T) {
 	cases := []invokeTestCase{
 		{args: wrapArgs(NewDict()), want: NewList().ToObject()},
 		{args: wrapArgs(newStringDict(map[string]*Object{"foo": NewInt(1).ToObject(), "bar": NewInt(2).ToObject()})), want: newTestList(newTestTuple("foo", 1), newTestTuple("bar", 2)).ToObject()},
-		{args: wrapArgs(newTestDict(123, True, "foo", False)), want: newTestList(newTestTuple(123, true), newTestTuple("foo", false)).ToObject()},
+		{args: wrapArgs(newTestDict(123, &True, "foo", &False)), want: newTestList(newTestTuple(123, true), newTestTuple("foo", false)).ToObject()},
 		{args: wrapArgs(deletedItemDict), want: newTestList(newTestTuple("foo", &None)).ToObject()},
 	}
 	for _, cas := range cases {
@@ -395,7 +395,7 @@ func TestDictNewInit(t *testing.T) {
 		{args: wrapArgs(), kwargs: wrapKWArgs("foo", 42), want: newTestDict("foo", 42).ToObject()},
 		{args: wrapArgs(newTestDict("foo", 42)), kwargs: wrapKWArgs("foo", "bar"), want: newTestDict("foo", "bar").ToObject()},
 		{args: wrapArgs(newTestList(newTestTuple("baz", 42))), kwargs: wrapKWArgs("foo", "bar"), want: newTestDict("baz", 42, "foo", "bar").ToObject()},
-		{args: wrapArgs(True), wantExc: mustCreateException(TypeErrorType, "'bool' object is not iterable")},
+		{args: wrapArgs(&True), wantExc: mustCreateException(TypeErrorType, "'bool' object is not iterable")},
 		{args: wrapArgs(NewList(), "foo"), wantExc: mustCreateException(TypeErrorType, "'__init__' requires 1 arguments")},
 	}
 	for _, cas := range cases {
@@ -542,11 +542,11 @@ func TestDictUpdate(t *testing.T) {
 		{args: wrapArgs(newTestDict(42, "foo")), want: newTestDict(42, "foo").ToObject()},
 		{args: wrapArgs(NewDict(), NewDict()), want: NewDict().ToObject()},
 		{args: wrapArgs(NewDict(), newTestDict("foo", 42, "bar", 43)), want: newTestDict("foo", 42, "bar", 43).ToObject()},
-		{args: wrapArgs(newTestDict(123, &None), newTestDict(124, True)), want: newTestDict(123, &None, 124, True).ToObject()},
+		{args: wrapArgs(newTestDict(123, &None), newTestDict(124, &True)), want: newTestDict(123, &None, 124, &True).ToObject()},
 		{args: wrapArgs(newTestDict("foo", 3.14), newTestDict("foo", "bar")), want: newTestDict("foo", "bar").ToObject()},
 		{args: wrapArgs(NewDict(), NewTuple()), want: NewDict().ToObject()},
 		{args: wrapArgs(NewDict(), newTestList(newTestTuple("foo", 42), newTestTuple("bar", 43))), want: newTestDict("foo", 42, "bar", 43).ToObject()},
-		{args: wrapArgs(newTestDict(123, &None), newTestTuple(newTestTuple(124, True))), want: newTestDict(123, &None, 124, True).ToObject()},
+		{args: wrapArgs(newTestDict(123, &None), newTestTuple(newTestTuple(124, &True))), want: newTestDict(123, &None, 124, &True).ToObject()},
 		{args: wrapArgs(newTestDict("foo", 3.14), newTestList(newTestList("foo", "bar"))), want: newTestDict("foo", "bar").ToObject()},
 		{args: wrapArgs(NewDict(), &None), wantExc: mustCreateException(TypeErrorType, "'NoneType' object is not iterable")},
 		{args: wrapArgs(NewDict(), newTestTuple(newTestList(&None, 42, "foo"))), wantExc: mustCreateException(ValueErrorType, "dictionary update sequence element has length 3; 2 is required")},
