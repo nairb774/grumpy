@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import difflib
 import itertools
 import os
@@ -37,11 +39,17 @@ class Block(object):
 
     targets = {maybe_int(i.args[0]) for i in ins if i.is_jump}
     self.targets = targets = {t for t in targets if isinstance(t, int)}
+
+    all_ins = []
     for idx, i in enumerate(ins):
       i.rel_lineno = i.lineno - min_line
       if i.pc in targets and (not idx or ins[idx-1].pc != i.pc):
-        i.is_target = True
-    self.ins = ins
+        j = Ins(i.pc, '%s:%d' % (i.file, i.lineno), '..IN..', '')
+        j.rel_lineno = i.rel_lineno
+        j.is_target = True
+        all_ins.append(j)
+      all_ins.append(i)
+    self.ins = all_ins
 
 
 class Ins(object):
