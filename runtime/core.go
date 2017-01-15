@@ -336,9 +336,9 @@ func IsSubclass(f *Frame, o *Object, classinfo *Object) (bool, *BaseException) {
 // IsTrue returns the truthiness of o according to the __nonzero__ operator.
 func IsTrue(f *Frame, o *Object) (bool, *BaseException) {
 	switch o {
-	case True.ToObject():
+	case &True.Object:
 		return true, nil
-	case False.ToObject(), &None:
+	case &False.Object, &None:
 		return false, nil
 	}
 	nonzero := o.typ.slots.NonZero

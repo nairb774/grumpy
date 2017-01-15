@@ -307,7 +307,7 @@ func floatCompare(v *Float, w *Object, ltResult, eqResult, gtResult *Int) *Objec
 	}
 	// There must be a NaN involved, which always compares false, even to other NaNs.
 	// This is true both in Go and in Python.
-	return False.ToObject()
+	return &False.Object
 }
 
 // floatCoerce will coerce any numeric type to a float. If all is

@@ -400,11 +400,11 @@ func setCompare(f *Frame, op compareOp, v *setBase, w *Object) (*Object, *BaseEx
 	switch op {
 	case compareOpLT:
 		if len1 >= len2 {
-			return False.ToObject(), nil
+			return &False.Object, nil
 		}
 	case compareOpLE:
 		if len1 > len2 {
-			return False.ToObject(), nil
+			return &False.Object, nil
 		}
 	case compareOpEq, compareOpNE:
 		if len1 != len2 {

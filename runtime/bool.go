@@ -37,7 +37,7 @@ func boolNative(_ *Frame, o *Object) (reflect.Value, *BaseException) {
 func boolNew(f *Frame, _ *Type, args Args, _ KWArgs) (*Object, *BaseException) {
 	argc := len(args)
 	if argc == 0 {
-		return False.ToObject(), nil
+		return &False.Object, nil
 	}
 	if argc != 1 {
 		return nil, f.RaiseType(TypeErrorType, fmt.Sprintf("bool() takes at most 1 argument (%d given)", argc))

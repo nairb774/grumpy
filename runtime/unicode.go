@@ -117,10 +117,10 @@ func unicodeContains(f *Frame, o *Object, value *Object) (*Object, *BaseExceptio
 	maxOffset := lhsLen - rhsLen
 	for offset := 0; offset <= maxOffset; offset++ {
 		if runeSliceCmp(lhs[offset:offset+rhsLen], rhs) == 0 {
-			return True.ToObject(), nil
+			return &True.Object, nil
 		}
 	}
-	return False.ToObject(), nil
+	return &False.Object, nil
 }
 
 func unicodeEncode(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {

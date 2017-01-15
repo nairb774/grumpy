@@ -279,9 +279,9 @@ func builtinCallable(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
 	}
 	o := args[0]
 	if call := o.Type().slots.Call; call == nil {
-		return False.ToObject(), nil
+		return &False.Object, nil
 	}
-	return True.ToObject(), nil
+	return &True.Object, nil
 }
 
 func builtinChr(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
@@ -369,11 +369,11 @@ func builtinHasAttr(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException
 	if _, raised := GetAttr(f, args[0], toStrUnsafe(args[1]), nil); raised != nil {
 		if raised.isInstance(AttributeErrorType) {
 			f.RestoreExc(nil, nil)
-			return False.ToObject(), nil
+			return &False.Object, nil
 		}
 		return nil, raised
 	}
-	return True.ToObject(), nil
+	return &True.Object, nil
 }
 
 func builtinHash(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
@@ -635,7 +635,7 @@ func init() {
 		"chr":            newBuiltinFunction("chr", builtinChr).ToObject(),
 		"cmp":            newBuiltinFunction("cmp", builtinCmp).ToObject(),
 		"dir":            newBuiltinFunction("dir", builtinDir).ToObject(),
-		"False":          False.ToObject(),
+		"False":          &False.Object,
 		"getattr":        newBuiltinFunction("getattr", builtinGetAttr).ToObject(),
 		"globals":        newBuiltinFunction("globals", builtinGlobals).ToObject(),
 		"hasattr":        newBuiltinFunction("hasattr", builtinHasAttr).ToObject(),
@@ -659,7 +659,7 @@ func init() {
 		"range":          newBuiltinFunction("range", builtinRange).ToObject(),
 		"repr":           newBuiltinFunction("repr", builtinRepr).ToObject(),
 		"sorted":         newBuiltinFunction("sorted", builtinSorted).ToObject(),
-		"True":           True.ToObject(),
+		"True":           &True.Object,
 		"unichr":         newBuiltinFunction("unichr", builtinUniChr).ToObject(),
 		"zip":            newBuiltinFunction("zip", builtinZip).ToObject(),
 	}

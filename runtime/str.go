@@ -808,7 +808,7 @@ func strStartsEndsWith(f *Frame, method string, args Args) (*Object, *BaseExcept
 	}
 	if start > end {
 		// start == end may still return true when matching ''.
-		return False.ToObject(), nil
+		return &False.Object, nil
 	}
 	s = s[start:end]
 	matcher := strings.HasPrefix
@@ -817,10 +817,10 @@ func strStartsEndsWith(f *Frame, method string, args Args) (*Object, *BaseExcept
 	}
 	for _, match := range matches {
 		if matcher(s, match) {
-			return True.ToObject(), nil
+			return &True.Object, nil
 		}
 	}
-	return False.ToObject(), nil
+	return &False.Object, nil
 }
 
 func strTitle(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
