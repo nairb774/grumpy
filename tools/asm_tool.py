@@ -32,17 +32,19 @@ class Block(object):
     self.name = head.partition(' t=')[0]
     self.head = head
 
-    if ins:
-      self.min_line = min_line = min(i.lineno for i in ins)
-    else:
-      self.min_line = min_line = 0
+    file_min = {}
+    for i in ins:
+      w = i.lineno
+      v = file_min.get(i.file)
+      if v is None or w < v:
+        file_min[i.file] = w
 
     targets = {maybe_int(i.args[0]) for i in ins if i.is_jump}
     self.targets = targets = {t for t in targets if isinstance(t, int)}
 
     all_ins = []
     for idx, i in enumerate(ins):
-      i.rel_lineno = i.lineno - min_line
+      i.rel_lineno = i.lineno - file_min[i.file]
       if i.pc in targets and (not idx or ins[idx-1].pc != i.pc):
         j = Ins(i.pc, '%s:%d' % (i.file, i.lineno), '..IN..', '')
         j.rel_lineno = i.rel_lineno
