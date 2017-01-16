@@ -37,7 +37,7 @@ def main(args):
     _MergeResults(results2, _RunBenchmark(args.prog2), benchmarks)
   _MergeResults(results2, _RunBenchmark(args.prog2), benchmarks)
   for b in sorted(benchmarks):
-    print b, '{:+.1%}'.format(results2[b] / results1[b] - 1)
+    print b, '{:+.1%}'.format(results2[b] / results1[b] - 1), results1[b], results2[b]
 
 
 def _MergeResults(merged, results, benchmarks):
