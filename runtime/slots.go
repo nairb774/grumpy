@@ -229,15 +229,13 @@ func (s *initSlot) wrapCallable(callable *Object) bool {
 	return true
 }
 
-type nativeSlot struct {
-	Fn func(*Frame, *Object) (reflect.Value, *BaseException)
-}
+type nativeSlot func(*Frame, *Object) (reflect.Value, *BaseException)
 
-func (s *nativeSlot) makeCallable(t *Type, slotName string) *Object {
+func (s nativeSlot) makeCallable(t *Type, slotName string) *Object {
 	return nil
 }
 
-func (s *nativeSlot) wrapCallable(callable *Object) bool {
+func (s nativeSlot) wrapCallable(callable *Object) bool {
 	return false
 }
 
@@ -409,7 +407,7 @@ type typeSlots struct {
 	LT           *binaryOpSlot
 	Mod          *binaryOpSlot
 	Mul          *binaryOpSlot
-	Native       *nativeSlot
+	Native       nativeSlot
 	NE           *binaryOpSlot
 	Neg          *unaryOpSlot
 	New          *newSlot

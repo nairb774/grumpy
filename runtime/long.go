@@ -334,7 +334,7 @@ func initLongType(dict map[string]*Object) {
 	LongType.slots.Long = &unaryOpSlot{longLong}
 	LongType.slots.Mod = longDivModOpSlot(longMod)
 	LongType.slots.Mul = longBinaryOpSlot(longMul)
-	LongType.slots.Native = &nativeSlot{longNative}
+	LongType.slots.Native = longNative
 	LongType.slots.NE = longBinaryBoolOpSlot(longNE)
 	LongType.slots.Neg = longUnaryOpSlot(longNeg)
 	LongType.slots.New = &newSlot{longNew}

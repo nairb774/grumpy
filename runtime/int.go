@@ -367,7 +367,7 @@ func initIntType(dict map[string]*Object) {
 	IntType.slots.Long = &unaryOpSlot{intLong}
 	IntType.slots.Mod = &binaryOpSlot{intMod}
 	IntType.slots.Mul = &binaryOpSlot{intMul}
-	IntType.slots.Native = &nativeSlot{intNative}
+	IntType.slots.Native = intNative
 	IntType.slots.NE = &binaryOpSlot{intNE}
 	IntType.slots.Neg = &unaryOpSlot{intNeg}
 	IntType.slots.New = &newSlot{intNew}

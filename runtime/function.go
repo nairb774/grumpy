@@ -138,7 +138,7 @@ func initFunctionType(map[string]*Object) {
 	FunctionType.flags &= ^(typeFlagInstantiable | typeFlagBasetype)
 	FunctionType.slots.Call = &callSlot{functionCall}
 	FunctionType.slots.Get = &getSlot{functionGet}
-	FunctionType.slots.Native = &nativeSlot{functionNative}
+	FunctionType.slots.Native = functionNative
 	FunctionType.slots.Repr = &unaryOpSlot{functionRepr}
 }
 

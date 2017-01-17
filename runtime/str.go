@@ -770,7 +770,7 @@ func initStrType(dict map[string]*Object) {
 	StrType.slots.Mul = &binaryOpSlot{strMul}
 	StrType.slots.NE = &binaryOpSlot{strNE}
 	StrType.slots.New = &newSlot{strNew}
-	StrType.slots.Native = &nativeSlot{strNative}
+	StrType.slots.Native = strNative
 	StrType.slots.Repr = &unaryOpSlot{strRepr}
 	StrType.slots.RMul = &binaryOpSlot{strMul}
 	StrType.slots.Str = &unaryOpSlot{strStr}

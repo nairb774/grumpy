@@ -40,6 +40,7 @@ func TestSlotMakeCallable(t *testing.T) {
 		}
 		return NewTuple(result, gotArgs).ToObject(), nil
 	})
+	var nativeSlot nativeSlot
 	cases := []invokeTestCase{
 		{args: wrapArgs(&basisSlot{}, None), want: None},
 		{args: wrapArgs(&binaryOpSlot{}, "foo", foo, 123), want: newTestTuple("foo", newTestTuple(foo, 123)).ToObject()},
@@ -58,7 +59,7 @@ func TestSlotMakeCallable(t *testing.T) {
 		{args: wrapArgs(&getAttributeSlot{}, RuntimeErrorType, foo, "bar"), wantExc: mustCreateException(RuntimeErrorType, "")},
 		{args: wrapArgs(&getSlot{}, 3.14, foo, 123, IntType), want: newTestTuple(3.14, newTestTuple(foo, 123, IntType)).ToObject()},
 		{args: wrapArgs(&getSlot{}, None, foo, "bar", "baz"), wantExc: mustCreateException(TypeErrorType, "'__slot__' requires a 'type' object but received a 'str'")},
-		{args: wrapArgs(&nativeSlot{}, None), want: None},
+		{args: wrapArgs(&nativeSlot, None), want: None},
 		{args: wrapArgs(&setAttrSlot{}, None, foo, "bar", 123), want: newTestTuple(None, newTestTuple(foo, "bar", 123)).ToObject()},
 		{args: wrapArgs(&setAttrSlot{}, None, foo, true, None), wantExc: mustCreateException(TypeErrorType, "'__slot__' requires a 'str' object but received a 'bool'")},
 		{args: wrapArgs(&setAttrSlot{}, RuntimeErrorType, foo, "bar", "baz"), wantExc: mustCreateException(RuntimeErrorType, "")},
@@ -93,6 +94,11 @@ func TestSlotWrapCallable(t *testing.T) {
 			gotKWArgs = kwargs.makeDict().ToObject()
 			return ret, nil
 		}).ToObject()
+		if s == nil {
+			// Return None to denote the slot was empty.
+			// TODO: A typed nil shouldn't cause interfaces to drop the type.
+			return None, nil
+		}
 		s.wrapCallable(wrapped)
 		fnField := reflect.ValueOf(s).Elem().Field(0)
 		if fnField.IsNil() {
@@ -112,6 +118,7 @@ func TestSlotWrapCallable(t *testing.T) {
 		return NewTuple(result, gotArgs, gotKWArgs).ToObject(), nil
 	})
 	o := newObject(ObjectType)
+	var nativeSlot nativeSlot
 	cases := []invokeTestCase{
 		{args: wrapArgs(&basisSlot{}, "no"), want: None},
 		{args: wrapArgs(&binaryOpSlot{}, "ret", "foo", "bar"), want: newTestTuple("ret", newTestTuple("foo", "bar"), NewDict()).ToObject()},
@@ -134,7 +141,7 @@ func TestSlotWrapCallable(t *testing.T) {
 		{args: wrapArgs(&initSlot{}, "ret", "foo", None, wrapKWArgs("a", "b")), want: newTestTuple("ret", newTestTuple("foo"), newTestDict("a", "b")).ToObject()},
 		{args: wrapArgs(&initSlot{}, "ret", 3.14, wrapArgs(false), wrapKWArgs("foo", 42)), want: newTestTuple("ret", newTestTuple(3.14, false), newTestDict("foo", 42)).ToObject()},
 		{args: wrapArgs(&initSlot{}, RuntimeErrorType, true, wrapArgs(1, 2), None), wantExc: mustCreateException(RuntimeErrorType, "")},
-		{args: wrapArgs(&nativeSlot{}, "no"), want: None},
+		{args: wrapArgs(nativeSlot, "no"), want: None},
 		{args: wrapArgs(&newSlot{}, "ret", StrType, wrapArgs(1, 2), None), want: newTestTuple("ret", newTestTuple(StrType, 1, 2), NewDict()).ToObject()},
 		{args: wrapArgs(&newSlot{}, "ret", ObjectType, None, wrapKWArgs("a", "b")), want: newTestTuple("ret", newTestTuple(ObjectType), newTestDict("a", "b")).ToObject()},
 		{args: wrapArgs(&newSlot{}, "ret", ListType, wrapArgs(false), wrapKWArgs("foo", 42)), want: newTestTuple("ret", newTestTuple(ListType, false), newTestDict("foo", 42)).ToObject()},
@@ -159,7 +166,10 @@ func TestSlotWrapCallable(t *testing.T) {
 // parameters to gotArgs and returns ret. If ret is type inheriting from
 // BaseException, an exception of that type will be raised instead.
 func prepareTestSlot(s slot, gotArgs **Object, ret *Object) {
-	fnField := reflect.ValueOf(s).Elem().Field(0)
+	fnField := reflect.ValueOf(s).Elem()
+	if fnField.Kind() == reflect.Struct {
+		fnField = fnField.Field(0)
+	}
 	slotFuncType := fnField.Type()
 	numIn := slotFuncType.NumIn()
 	numOut := slotFuncType.NumOut()

@@ -77,7 +77,7 @@ func newNativeType(rtype reflect.Type, base *Type) *Type {
 		rtype,
 	}
 	if !base.isSubclass(nativeType) {
-		t.slots.Native = &nativeSlot{nativeTypedefNative}
+		t.slots.Native = nativeTypedefNative
 	}
 	return &t.Type
 }
@@ -88,7 +88,7 @@ func nativeTypedefNative(f *Frame, o *Object) (reflect.Value, *BaseException) {
 	// (e.g. type devNull int) we should return the subtype, not the
 	// primitive type.  So first call the primitive type's __native__ and
 	// then convert it to the appropriate subtype.
-	val, raised := o.typ.bases[0].slots.Native.Fn(f, o)
+	val, raised := o.typ.bases[0].slots.Native(f, o)
 	if raised != nil {
 		return reflect.Value{}, raised
 	}
@@ -132,7 +132,7 @@ func newNativeBoolType(rtype reflect.Type) *Type {
 	}
 	t.trueValue = (&Int{Object{typ: &t.nativeMetaclass.Type}, 1}).ToObject()
 	t.falseValue = (&Int{Object{typ: &t.nativeMetaclass.Type}, 0}).ToObject()
-	t.slots.Native = &nativeSlot{nativeBoolNative}
+	t.slots.Native = nativeBoolNative
 	t.slots.New = &newSlot{nativeBoolNew}
 	return &t.nativeMetaclass.Type
 }
@@ -186,7 +186,7 @@ func nativeNative(f *Frame, o *Object) (reflect.Value, *BaseException) {
 
 func initNativeType(map[string]*Object) {
 	nativeType.flags = typeFlagDefault &^ typeFlagInstantiable
-	nativeType.slots.Native = &nativeSlot{nativeNative}
+	nativeType.slots.Native = nativeNative
 }
 
 func nativeFuncCall(f *Frame, callable *Object, args Args, kwargs KWArgs) (*Object, *BaseException) {

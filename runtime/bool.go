@@ -59,7 +59,7 @@ func boolRepr(_ *Frame, o *Object) (*Object, *BaseException) {
 
 func initBoolType(map[string]*Object) {
 	BoolType.flags &= ^(typeFlagInstantiable | typeFlagBasetype)
-	BoolType.slots.Native = &nativeSlot{boolNative}
+	BoolType.slots.Native = boolNative
 	BoolType.slots.New = &newSlot{boolNew}
 	BoolType.slots.Repr = &unaryOpSlot{boolRepr}
 }

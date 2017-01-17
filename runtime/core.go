@@ -814,7 +814,7 @@ func ToIntValue(f *Frame, o *Object) (int, *BaseException) {
 // operator.
 func ToNative(f *Frame, o *Object) (reflect.Value, *BaseException) {
 	if native := o.typ.slots.Native; native != nil {
-		return native.Fn(f, o)
+		return native(f, o)
 	}
 	return reflect.ValueOf(o), nil
 }

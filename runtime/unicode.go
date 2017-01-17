@@ -428,7 +428,7 @@ func initUnicodeType(dict map[string]*Object) {
 	UnicodeType.slots.Mul = &binaryOpSlot{unicodeMul}
 	UnicodeType.slots.NE = &binaryOpSlot{unicodeNE}
 	UnicodeType.slots.New = &newSlot{unicodeNew}
-	UnicodeType.slots.Native = &nativeSlot{unicodeNative}
+	UnicodeType.slots.Native = unicodeNative
 	UnicodeType.slots.RMul = &binaryOpSlot{unicodeMul}
 	UnicodeType.slots.Repr = &unaryOpSlot{unicodeRepr}
 	UnicodeType.slots.Str = &unaryOpSlot{unicodeStr}

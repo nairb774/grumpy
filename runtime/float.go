@@ -252,7 +252,7 @@ func initFloatType(dict map[string]*Object) {
 	FloatType.slots.LT = &binaryOpSlot{floatLT}
 	FloatType.slots.Mod = &binaryOpSlot{floatMod}
 	FloatType.slots.Mul = &binaryOpSlot{floatMul}
-	FloatType.slots.Native = &nativeSlot{floatNative}
+	FloatType.slots.Native = floatNative
 	FloatType.slots.NE = &binaryOpSlot{floatNE}
 	FloatType.slots.Neg = &unaryOpSlot{floatNeg}
 	FloatType.slots.New = &newSlot{floatNew}
