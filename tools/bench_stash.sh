@@ -4,6 +4,7 @@ set -ex
 
 cd "${0%/*}/.."
 
+rm -rf "$PWD/build/benchmarks"
 make -j12 -k benchmarks
 
 OUT="$PWD/build/benchmarks.$(git rev-parse --short --verify HEAD)"
