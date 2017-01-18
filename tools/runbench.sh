@@ -10,7 +10,7 @@ function run() {
     rm "$PWD/build/bench.$1.tmp" || true
     for I in $(seq 1 3); do
       for f in "$PWD/build/benchmarks.$1/"*; do
-        "$f"
+        "$f" || exit
       done
     done | tee "$PWD/build/bench.$1.tmp"
     mv "$PWD/build/bench.$1.tmp" "$PWD/build/bench.$1"
