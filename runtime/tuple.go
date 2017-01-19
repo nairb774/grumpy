@@ -32,7 +32,9 @@ func NewTuple(elems ...*Object) *Tuple {
 	if len(elems) == 0 {
 		return emptyTuple
 	}
-	return &Tuple{Object: Object{typ: TupleType}, elems: elems}
+	t := &Tuple{Object: Object{typ: TupleType}, elems: elems}
+	t.self = t
+	return t
 }
 
 // Below are direct allocation versions of small Tuples. Rather than performing
@@ -158,6 +160,10 @@ func (t *Tuple) ToObject() *Object {
 var TupleType = newBasisType("tuple", reflect.TypeOf(Tuple{}), toTupleUnsafe, ObjectType)
 
 var emptyTuple = &Tuple{Object: Object{typ: TupleType}}
+
+func init() {
+	emptyTuple.self = emptyTuple
+}
 
 func tupleAdd(f *Frame, v, w *Object) (*Object, *BaseException) {
 	if !w.isInstance(TupleType) {

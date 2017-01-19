@@ -36,6 +36,10 @@ var (
 	}
 )
 
+func init() {
+	ObjectType.self = ObjectType
+}
+
 // Object represents Python 'object' objects.
 type Object struct {
 	typ  *Type `attr:"__class__"`
@@ -49,9 +53,11 @@ func newObject(t *Type) *Object {
 	if t != ObjectType {
 		dict = NewDict()
 	}
-	o := (*Object)(unsafe.Pointer(reflect.New(t.basis).Pointer()))
+	outside := reflect.New(t.basis)
+	o := (*Object)(unsafe.Pointer(outside.Pointer()))
 	o.typ = t
 	o.dict = dict
+	o.self = outside.Interface()
 	return o
 }
 

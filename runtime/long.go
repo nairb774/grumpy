@@ -43,17 +43,19 @@ type Long struct {
 
 // NewLong returns a new Long holding the given value.
 func NewLong(x *big.Int) *Long {
-	result := Long{Object: Object{typ: LongType}}
+	result := &Long{Object: Object{typ: LongType}}
+	result.self = result
 	result.value.Set(x)
-	return &result
+	return result
 }
 
 // NewLongFromBytes returns a new Long holding the given bytes,
 // interpreted as a big endian unsigned integer.
 func NewLongFromBytes(b []byte) *Long {
-	result := Long{Object: Object{typ: LongType}}
+	result := &Long{Object: Object{typ: LongType}}
+	result.self = result
 	result.value.SetBytes(b)
-	return &result
+	return result
 }
 
 func toLongUnsafe(o *Object) *Long {
@@ -86,10 +88,11 @@ func (l *Long) IsTrue() bool {
 
 // Neg returns a new Long that is the negative of l.
 func (l *Long) Neg() *Long {
-	result := Long{Object: Object{typ: LongType}}
+	result := &Long{Object: Object{typ: LongType}}
+	result.self = result
 	result.value.Set(&l.value)
 	result.value.Neg(&result.value)
-	return &result
+	return result
 }
 
 // LongType is the object representing the Python 'long' type.
@@ -188,7 +191,8 @@ func longLong(f *Frame, o *Object) (*Object, *BaseException) {
 	if o.typ == LongType {
 		return o, nil
 	}
-	l := Long{Object: Object{typ: LongType}}
+	l := &Long{Object: Object{typ: LongType}}
+	l.self = l
 	l.value.Set(&toLongUnsafe(o).value)
 	return l.ToObject(), nil
 }
@@ -382,7 +386,8 @@ func initLongType(dict map[string]*Object) {
 }
 
 func longCallUnary(fun func(z, x *big.Int), v *Long) *Object {
-	l := Long{Object: Object{typ: LongType}}
+	l := &Long{Object: Object{typ: LongType}}
+	l.self = l
 	fun(&l.value, &v.value)
 	return l.ToObject()
 }
@@ -392,7 +397,8 @@ func longCallUnaryBool(fun func(x *big.Int) bool, v *Long) *Object {
 }
 
 func longCallBinary(fun func(z, x, y *big.Int), v, w *Long) *Object {
-	l := Long{Object: Object{typ: LongType}}
+	l := &Long{Object: Object{typ: LongType}}
+	l.self = l
 	fun(&l.value, &v.value, &w.value)
 	return l.ToObject()
 }
@@ -408,7 +414,8 @@ func longCallShift(fun func(z, x *big.Int, n uint), f *Frame, v, w *Long) (*Obje
 	if w.value.Sign() < 0 {
 		return nil, f.RaiseType(ValueErrorType, "negative shift count")
 	}
-	l := Long{Object: Object{typ: LongType}}
+	l := &Long{Object: Object{typ: LongType}}
+	l.self = l
 	fun(&l.value, &v.value, uint(w.value.Int64()))
 	return l.ToObject(), nil
 }

@@ -54,6 +54,7 @@ func newChildFrame(back *Frame) *Frame {
 	f := back.frameCache
 	if f == nil {
 		f = &Frame{Object: Object{typ: FrameType}}
+		f.self = f
 	} else {
 		back.frameCache, f.back = f.back, nil
 		// Reset local state late.

@@ -334,6 +334,7 @@ func TestTypeGetAttribute(t *testing.T) {
 	//   __metaclass__ = BarMeta
 	// bar = Bar()
 	barType := &Type{Object: Object{typ: barMetaType}, name: "Bar", basis: fooType.basis, bases: []*Type{fooType}}
+	barType.self = barType
 	barType.dict = newTestDict("bar", "Bar's bar", "foo", 101, "barsetter", setter, "barmetasetter", "NOT setter")
 	bar := newObject(barType)
 	prepareType(barType)

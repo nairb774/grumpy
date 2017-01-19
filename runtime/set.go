@@ -72,7 +72,9 @@ type Set setBase
 
 // NewSet returns an empty Set.
 func NewSet() *Set {
-	return &Set{Object{typ: SetType}, NewDict()}
+	s := &Set{Object{typ: SetType}, NewDict()}
+	s.self = s
+	return s
 }
 
 func toSetUnsafe(o *Object) *Set {

@@ -100,13 +100,15 @@ func newClass(f *Frame, meta *Type, name string, bases []*Type, dict *Dict) (*Ty
 }
 
 func newType(meta *Type, name string, basis reflect.Type, bases []*Type, dict *Dict) *Type {
-	return &Type{
+	t := &Type{
 		Object: Object{typ: meta, dict: dict},
 		name:   name,
 		basis:  basis,
 		bases:  bases,
 		flags:  typeFlagDefault,
 	}
+	t.self = t
+	return t
 }
 
 func newBasisType(name string, basis reflect.Type, basisFunc interface{}, base *Type) *Type {
@@ -333,6 +335,10 @@ var TypeType = &Type{
 	bases: []*Type{ObjectType},
 	flags: typeFlagDefault,
 	slots: typeSlots{Basis: &basisSlot{typeBasisFunc}},
+}
+
+func init() {
+	TypeType.self = TypeType
 }
 
 func typeCall(f *Frame, callable *Object, args Args, kwargs KWArgs) (*Object, *BaseException) {

@@ -274,6 +274,7 @@ func TestObjectReduce(t *testing.T) {
 	})
 	fooType := newTestClass("Foo", []*Type{StrType}, NewDict())
 	fooNoDict := &Str{Object: Object{typ: fooType}, value: "fooNoDict"}
+	fooNoDict.self = fooNoDict
 	// Calling __reduce_ex__ on a type that overrides __reduce__ should
 	// forward to the call to __reduce__.
 	reduceOverrideType := newTestClass("ReduceOverride", []*Type{ObjectType}, newStringDict(map[string]*Object{
@@ -299,6 +300,7 @@ func TestObjectReduce(t *testing.T) {
 	// subclasses can be reduced.
 	intSubclass := newTestClass("IntSubclass", []*Type{IntType}, NewDict())
 	intSubclassInst := &Int{Object{typ: intSubclass}, 123}
+	intSubclassInst.self = intSubclassInst
 	cases := []invokeTestCase{
 		{args: wrapArgs("__reduce__", 42, Args{}), wantExc: mustCreateException(TypeErrorType, "can't pickle int objects")},
 		{args: wrapArgs("__reduce__", 42, wrapArgs(2)), want: newTestTuple(42, None, None, None).ToObject()},

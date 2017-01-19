@@ -26,7 +26,9 @@ type Property struct {
 }
 
 func newProperty(get, set, del *Object) *Property {
-	return &Property{Object{typ: PropertyType}, get, set, del}
+	p := &Property{Object{typ: PropertyType}, get, set, del}
+	p.self = p
+	return p
 }
 
 func toPropertyUnsafe(o *Object) *Property {

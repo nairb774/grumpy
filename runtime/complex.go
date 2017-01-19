@@ -31,7 +31,9 @@ type Complex struct {
 
 // NewComplex returns a new Complex holding the given complex value.
 func NewComplex(value complex128) *Complex {
-	return &Complex{Object{typ: ComplexType}, value}
+	c := &Complex{Object{typ: ComplexType}, value}
+	c.self = c
+	return c
 }
 
 func toComplexUnsafe(o *Object) *Complex {

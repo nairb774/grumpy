@@ -52,6 +52,7 @@ func InternStr(s string) *Str {
 	str, _ := internedStrs[s]
 	if str == nil {
 		str = &Str{Object: Object{typ: StrType}, value: s, hash: NewInt(hashString(s))}
+		str.self = str
 		internedStrs[s] = str
 	}
 	return str
@@ -69,7 +70,9 @@ func NewStr(value string) *Str {
 	if s := internedStrs[value]; s != nil {
 		return s
 	}
-	return &Str{Object: Object{typ: StrType}, value: value}
+	s := &Str{Object: Object{typ: StrType}, value: value}
+	s.self = s
+	return s
 }
 
 func toStrUnsafe(o *Object) *Str {

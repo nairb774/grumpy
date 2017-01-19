@@ -88,6 +88,7 @@ func enumerateNew(f *Frame, t *Type, args Args, _ KWArgs) (*Object, *BaseExcepti
 		d = NewDict()
 	}
 	e := &enumerate{Object: Object{typ: t, dict: d}, index: index, iter: iter}
+	e.self = e
 	return &e.Object, nil
 }
 
@@ -179,7 +180,9 @@ func xrangeGetItem(f *Frame, o, key *Object) (*Object, *BaseException) {
 
 func xrangeIter(f *Frame, o *Object) (*Object, *BaseException) {
 	r := toXRangeUnsafe(o)
-	return &(&rangeIterator{Object{typ: rangeIteratorType}, r.start, r.stop, r.step}).Object, nil
+	ri := &rangeIterator{Object{typ: rangeIteratorType}, r.start, r.stop, r.step}
+	ri.self = ri
+	return &ri.Object, nil
 }
 
 func xrangeLen(f *Frame, o *Object) (*Object, *BaseException) {
@@ -214,6 +217,7 @@ func xrangeNew(f *Frame, _ *Type, args Args, _ KWArgs) (*Object, *BaseException)
 		return nil, f.RaiseType(OverflowErrorType, errResultTooLarge)
 	}
 	r := &xrange{Object: Object{typ: xrangeType}, start: start, stop: stop, step: step}
+	r.self = r
 	return &r.Object, nil
 }
 

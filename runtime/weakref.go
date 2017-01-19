@@ -123,8 +123,9 @@ func weakRefNew(f *Frame, t *Type, args Args, _ KWArgs) (*Object, *BaseException
 			r = (*WeakRef)(p)
 			break
 		} else {
-			r = &WeakRef{Object: Object{typ: WeakRefType}, ptr: uintptr(o.toPointer())}
-			if atomic.CompareAndSwapPointer(addr, nilPtr, r.toPointer()) {
+			r = &WeakRef{Object: Object{typ: WeakRefType}, ptr: reflect.ValueOf(o).Pointer()}
+			r.self = r
+			if atomic.CompareAndSwapPointer(addr, nilPtr, unsafe.Pointer(r)) {
 				runtime.SetFinalizer(o, weakRefFinalizeReferent)
 				break
 			}

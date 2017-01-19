@@ -46,7 +46,9 @@ type Code struct {
 // NewCode creates a new Code object that executes the given fn.
 func NewCode(name, filename string, params []Param, flags CodeFlag, fn func(*Frame, []*Object) (*Object, *BaseException)) *Code {
 	s := NewParamSpec(name, params, flags&CodeFlagVarArg != 0, flags&CodeFlagKWArg != 0)
-	return &Code{Object{typ: CodeType}, name, filename, len(params), flags, s, fn}
+	c := &Code{Object{typ: CodeType}, name, filename, len(params), flags, s, fn}
+	c.self = c
+	return c
 }
 
 func toCodeUnsafe(o *Object) *Code {

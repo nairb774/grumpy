@@ -50,7 +50,9 @@ func NewGenerator(f *Frame, fn func(*Object) (*Object, *BaseException)) *Generat
 	// off and prevent a parasitic `taken` from creeping up the frames.
 	f.back = nil
 
-	return &Generator{Object: Object{typ: GeneratorType}, frame: f, fn: fn}
+	g := &Generator{Object: Object{typ: GeneratorType}, frame: f, fn: fn}
+	g.self = g
+	return g
 }
 
 func toGeneratorUnsafe(o *Object) *Generator {

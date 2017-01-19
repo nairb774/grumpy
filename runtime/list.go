@@ -35,6 +35,7 @@ type List struct {
 // NewList returns a list containing the given elements.
 func NewList(elems ...*Object) *List {
 	l := &List{Object: Object{typ: ListType}}
+	l.self = l
 	numElems := len(elems)
 	l.resize(numElems)
 	for i := 0; i < numElems; i++ {
@@ -502,6 +503,7 @@ type listIterator struct {
 
 func newListIterator(l *List) *Object {
 	iter := &listIterator{Object: Object{typ: listIteratorType}, list: l}
+	iter.self = iter
 	return &iter.Object
 }
 

@@ -28,7 +28,9 @@ type Traceback struct {
 
 func newTraceback(f *Frame, next *Traceback) *Traceback {
 	f.taken = true
-	return &Traceback{Object{typ: TracebackType}, f, next, f.lineno}
+	t := &Traceback{Object{typ: TracebackType}, f, next, f.lineno}
+	t.self = t
+	return t
 }
 
 func toTracebackUnsafe(o *Object) *Traceback {

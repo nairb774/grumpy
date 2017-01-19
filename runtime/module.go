@@ -186,7 +186,9 @@ func newModule(name, filename string) *Module {
 		"__file__": NewStr(filename).ToObject(),
 		"__name__": NewStr(name).ToObject(),
 	})
-	return &Module{Object: Object{typ: ModuleType, dict: d}}
+	m := &Module{Object: Object{typ: ModuleType, dict: d}}
+	m.self = m
+	return m
 }
 
 func toModuleUnsafe(o *Object) *Module {

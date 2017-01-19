@@ -78,6 +78,7 @@ func newNativeType(rtype reflect.Type, base *Type) *Type {
 		},
 		rtype,
 	}
+	t.self = t
 	if !base.isSubclass(nativeType) {
 		t.slots.Native = &nativeSlot{nativeTypedefNative}
 	}
@@ -132,8 +133,16 @@ func newNativeBoolType(rtype reflect.Type) *Type {
 			rtype,
 		},
 	}
-	t.trueValue = (&Int{Object{typ: &t.nativeMetaclass.Type}, 1}).ToObject()
-	t.falseValue = (&Int{Object{typ: &t.nativeMetaclass.Type}, 0}).ToObject()
+	t.self = t
+
+	tv := &Int{Object{typ: &t.nativeMetaclass.Type}, 1}
+	tv.self = tv
+	t.trueValue = tv.ToObject()
+
+	fv := &Int{Object{typ: &t.nativeMetaclass.Type}, 0}
+	fv.self = fv
+	t.falseValue = fv.ToObject()
+
 	t.slots.Native = &nativeSlot{nativeBoolNative}
 	t.slots.New = &newSlot{nativeBoolNew}
 	return &t.nativeMetaclass.Type
@@ -240,6 +249,7 @@ type sliceIterator struct {
 
 func newSliceIterator(slice reflect.Value) *Object {
 	iter := &sliceIterator{Object: Object{typ: sliceIteratorType}, slice: slice, numElems: slice.Len()}
+	iter.self = iter
 	return &iter.Object
 }
 
@@ -313,7 +323,9 @@ func WrapNative(f *Frame, v reflect.Value) (*Object, *BaseException) {
 		}
 		// TODO: Make native bool subtypes singletons and add support
 		// for __new__ so we can use t.Call() here.
-		return (&Int{Object{typ: t}, i}).ToObject(), nil
+		v := &Int{Object{typ: t}, i}
+		v.self = v
+		return v.ToObject(), nil
 	case reflect.Complex64:
 	case reflect.Complex128:
 		c := v.Complex()
@@ -388,7 +400,9 @@ func WrapNative(f *Frame, v reflect.Value) (*Object, *BaseException) {
 			return None, nil
 		}
 	}
-	return (&native{Object{typ: t}, v}).ToObject(), nil
+	n := &native{Object{typ: t}, v}
+	n.self = n
+	return n.ToObject(), nil
 }
 
 func getNativeType(rtype reflect.Type) *Type {

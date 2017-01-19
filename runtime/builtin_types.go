@@ -50,6 +50,11 @@ var (
 	UnboundLocal = newObject(unboundLocalType)
 )
 
+func init() {
+	Ellipsis.self = Ellipsis
+	None.self = None
+}
+
 func ellipsisRepr(*Frame, *Object) (*Object, *BaseException) {
 	return NewStr("Ellipsis").ToObject(), nil
 }

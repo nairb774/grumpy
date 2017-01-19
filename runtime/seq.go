@@ -354,6 +354,7 @@ type seqIterator struct {
 
 func newSeqIterator(seq *Object) *Object {
 	iter := &seqIterator{Object: Object{typ: seqIteratorType}, seq: seq}
+	iter.self = iter
 	return &iter.Object
 }
 
