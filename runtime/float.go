@@ -39,7 +39,7 @@ func NewFloat(value float64) *Float {
 }
 
 func toFloatUnsafe(o *Object) *Float {
-	return (*Float)(o.toPointer())
+	return o.self.(*Float)
 }
 
 // ToObject upcasts f to an Object.

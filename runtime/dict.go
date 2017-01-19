@@ -294,7 +294,7 @@ func newStringDict(items map[string]*Object) *Dict {
 }
 
 func toDictUnsafe(o *Object) *Dict {
-	return (*Dict)(o.toPointer())
+	return o.self.(*Dict)
 }
 
 // loadTable atomically loads and returns d's underlying dictTable.
@@ -842,7 +842,7 @@ func newDictItemIterator(d *Dict) *dictItemIterator {
 }
 
 func toDictItemIteratorUnsafe(o *Object) *dictItemIterator {
-	return (*dictItemIterator)(o.toPointer())
+	return o.self.(*dictItemIterator)
 }
 
 func (iter *dictItemIterator) ToObject() *Object {
@@ -887,7 +887,7 @@ func newDictKeyIterator(d *Dict) *dictKeyIterator {
 }
 
 func toDictKeyIteratorUnsafe(o *Object) *dictKeyIterator {
-	return (*dictKeyIterator)(o.toPointer())
+	return o.self.(*dictKeyIterator)
 }
 
 func (iter *dictKeyIterator) ToObject() *Object {
@@ -932,7 +932,7 @@ func newDictValueIterator(d *Dict) *dictValueIterator {
 }
 
 func toDictValueIteratorUnsafe(o *Object) *dictValueIterator {
-	return (*dictValueIterator)(o.toPointer())
+	return o.self.(*dictValueIterator)
 }
 
 func (iter *dictValueIterator) ToObject() *Object {

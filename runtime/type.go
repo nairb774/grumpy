@@ -270,7 +270,18 @@ func mroCalc(t *Type) []*Type {
 }
 
 func toTypeUnsafe(o *Object) *Type {
-	return (*Type)(o.toPointer())
+	switch t := o.self.(type) {
+	case *Type:
+		return t
+	case *nativeMetaclass:
+		// TODO: Check this for sanity...
+		return &t.Type
+	case *nativeBoolMetaclass:
+		// TODO: Check this for sanity...
+		return &t.Type
+	default:
+		return o.self.(*Type) // Make a properly useful panic
+	}
 }
 
 // ToObject upcasts t to an Object.

@@ -34,7 +34,7 @@ func newTraceback(f *Frame, next *Traceback) *Traceback {
 }
 
 func toTracebackUnsafe(o *Object) *Traceback {
-	return (*Traceback)(o.toPointer())
+	return o.self.(*Traceback)
 }
 
 // ToObject upcasts f to an Object.

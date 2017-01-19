@@ -37,7 +37,7 @@ func NewMethod(function *Function, self *Object, class *Type) *Method {
 }
 
 func toMethodUnsafe(o *Object) *Method {
-	return (*Method)(o.toPointer())
+	return o.self.(*Method)
 }
 
 // ToObject upcasts m to an Object.

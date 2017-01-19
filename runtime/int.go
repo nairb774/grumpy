@@ -52,7 +52,7 @@ func NewInt(value int) *Int {
 }
 
 func toIntUnsafe(o *Object) *Int {
-	return (*Int)(o.toPointer())
+	return o.self.(*Int)
 }
 
 // ToObject upcasts i to an Object.

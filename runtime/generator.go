@@ -56,7 +56,7 @@ func NewGenerator(f *Frame, fn func(*Object) (*Object, *BaseException)) *Generat
 }
 
 func toGeneratorUnsafe(o *Object) *Generator {
-	return (*Generator)(o.toPointer())
+	return o.self.(*Generator)
 }
 
 func (g *Generator) resume(f *Frame, sendValue *Object) (*Object, *BaseException) {

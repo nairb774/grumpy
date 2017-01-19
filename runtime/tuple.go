@@ -67,6 +67,7 @@ func NewTuple1(elem0 *Object) *Tuple {
 		tuple: Tuple{Object: Object{typ: TupleType}},
 		elems: [1]*Object{elem0},
 	}
+	t.tuple.self = &t.tuple
 	t.tuple.elems = t.elems[:]
 	return &t.tuple
 }
@@ -80,6 +81,7 @@ func NewTuple2(elem0, elem1 *Object) *Tuple {
 		tuple: Tuple{Object: Object{typ: TupleType}},
 		elems: [2]*Object{elem0, elem1},
 	}
+	t.tuple.self = &t.tuple
 	t.tuple.elems = t.elems[:]
 	return &t.tuple
 }
@@ -93,6 +95,7 @@ func NewTuple3(elem0, elem1, elem2 *Object) *Tuple {
 		tuple: Tuple{Object: Object{typ: TupleType}},
 		elems: [3]*Object{elem0, elem1, elem2},
 	}
+	t.tuple.self = &t.tuple
 	t.tuple.elems = t.elems[:]
 	return &t.tuple
 }
@@ -106,6 +109,7 @@ func NewTuple4(elem0, elem1, elem2, elem3 *Object) *Tuple {
 		tuple: Tuple{Object: Object{typ: TupleType}},
 		elems: [4]*Object{elem0, elem1, elem2, elem3},
 	}
+	t.tuple.self = &t.tuple
 	t.tuple.elems = t.elems[:]
 	return &t.tuple
 }
@@ -119,6 +123,7 @@ func NewTuple5(elem0, elem1, elem2, elem3, elem4 *Object) *Tuple {
 		tuple: Tuple{Object: Object{typ: TupleType}},
 		elems: [5]*Object{elem0, elem1, elem2, elem3, elem4},
 	}
+	t.tuple.self = &t.tuple
 	t.tuple.elems = t.elems[:]
 	return &t.tuple
 }
@@ -132,12 +137,13 @@ func NewTuple6(elem0, elem1, elem2, elem3, elem4, elem5 *Object) *Tuple {
 		tuple: Tuple{Object: Object{typ: TupleType}},
 		elems: [6]*Object{elem0, elem1, elem2, elem3, elem4, elem5},
 	}
+	t.tuple.self = &t.tuple
 	t.tuple.elems = t.elems[:]
 	return &t.tuple
 }
 
 func toTupleUnsafe(o *Object) *Tuple {
-	return (*Tuple)(o.toPointer())
+	return o.self.(*Tuple)
 }
 
 // GetItem returns the i'th element of t. Bounds are unchecked and therefore

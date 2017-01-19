@@ -48,7 +48,7 @@ func NewUnicodeFromRunes(value []rune) *Unicode {
 }
 
 func toUnicodeUnsafe(o *Object) *Unicode {
-	return (*Unicode)(o.toPointer())
+	return o.self.(*Unicode)
 }
 
 // Encode translates the runes in s into a str with the given encoding.

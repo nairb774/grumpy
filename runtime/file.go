@@ -51,7 +51,7 @@ func NewFileFromFD(fd uintptr) *File {
 }
 
 func toFileUnsafe(o *Object) *File {
-	return (*File)(o.toPointer())
+	return o.self.(*File)
 }
 
 // ToObject upcasts f to an Object.

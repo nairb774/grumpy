@@ -78,7 +78,7 @@ func NewSet() *Set {
 }
 
 func toSetUnsafe(o *Object) *Set {
-	return (*Set)(o.toPointer())
+	return o.self.(*Set)
 }
 
 // Add inserts key into s. If key already exists then does nothing.
@@ -267,7 +267,7 @@ func initSetType(dict map[string]*Object) {
 type FrozenSet setBase
 
 func toFrozenSetUnsafe(o *Object) *FrozenSet {
-	return (*FrozenSet)(o.toPointer())
+	return o.self.(*FrozenSet)
 }
 
 // Contains returns true if key exists in s.

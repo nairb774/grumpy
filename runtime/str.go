@@ -76,7 +76,7 @@ func NewStr(value string) *Str {
 }
 
 func toStrUnsafe(o *Object) *Str {
-	return (*Str)(o.toPointer())
+	return o.self.(*Str)
 }
 
 // Decode produces a unicode object from the bytes of s assuming they have the

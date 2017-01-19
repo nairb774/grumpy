@@ -47,7 +47,7 @@ type WeakRef struct {
 }
 
 func toWeakRefUnsafe(o *Object) *WeakRef {
-	return (*WeakRef)(o.toPointer())
+	return o.self.(*WeakRef)
 }
 
 // get returns r's referent, or nil if r is "dead".

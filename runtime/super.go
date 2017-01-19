@@ -31,7 +31,7 @@ type super struct {
 }
 
 func toSuperUnsafe(o *Object) *super {
-	return (*super)(o.toPointer())
+	return o.self.(*super)
 }
 
 func superInit(f *Frame, o *Object, args Args, _ KWArgs) (*Object, *BaseException) {

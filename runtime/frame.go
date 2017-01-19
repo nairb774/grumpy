@@ -45,6 +45,7 @@ type Frame struct {
 // NewRootFrame creates a Frame that is the bottom of a new stack.
 func NewRootFrame() *Frame {
 	f := &Frame{Object: Object{typ: FrameType}}
+	f.self = f
 	f.pushFrame(nil)
 	return f
 }
@@ -90,7 +91,7 @@ func (f *Frame) pushFrame(back *Frame) {
 }
 
 func toFrameUnsafe(o *Object) *Frame {
-	return (*Frame)(o.toPointer())
+	return o.self.(*Frame)
 }
 
 // Globals returns the globals dict for this frame.

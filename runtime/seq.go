@@ -359,7 +359,7 @@ func newSeqIterator(seq *Object) *Object {
 }
 
 func toSeqIteratorUnsafe(o *Object) *seqIterator {
-	return (*seqIterator)(o.toPointer())
+	return o.self.(*seqIterator)
 }
 
 func seqIteratorIter(f *Frame, o *Object) (*Object, *BaseException) {

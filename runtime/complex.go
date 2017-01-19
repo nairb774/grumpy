@@ -37,7 +37,7 @@ func NewComplex(value complex128) *Complex {
 }
 
 func toComplexUnsafe(o *Object) *Complex {
-	return (*Complex)(o.toPointer())
+	return o.self.(*Complex)
 }
 
 // ToObject upcasts c to an Object.

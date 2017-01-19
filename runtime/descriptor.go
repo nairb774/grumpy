@@ -32,7 +32,7 @@ func newProperty(get, set, del *Object) *Property {
 }
 
 func toPropertyUnsafe(o *Object) *Property {
-	return (*Property)(o.toPointer())
+	return o.self.(*Property)
 }
 
 // ToObject upcasts p to an Object.

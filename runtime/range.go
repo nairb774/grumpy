@@ -37,7 +37,7 @@ type enumerate struct {
 }
 
 func toEnumerateUnsafe(o *Object) *enumerate {
-	return (*enumerate)(o.toPointer())
+	return o.self.(*enumerate)
 }
 
 func enumerateIter(f *Frame, o *Object) (*Object, *BaseException) {
@@ -127,7 +127,7 @@ type rangeIterator struct {
 }
 
 func toRangeIteratorUnsafe(o *Object) *rangeIterator {
-	return (*rangeIterator)(o.toPointer())
+	return o.self.(*rangeIterator)
 }
 
 func rangeIteratorIter(f *Frame, o *Object) (*Object, *BaseException) {
@@ -158,7 +158,7 @@ type xrange struct {
 }
 
 func toXRangeUnsafe(o *Object) *xrange {
-	return (*xrange)(o.toPointer())
+	return o.self.(*xrange)
 }
 
 func xrangeGetItem(f *Frame, o, key *Object) (*Object, *BaseException) {

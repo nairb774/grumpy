@@ -103,7 +103,7 @@ func newBuiltinFunction(name string, fn Func) *Function {
 }
 
 func toFunctionUnsafe(o *Object) *Function {
-	return (*Function)(o.toPointer())
+	return o.self.(*Function)
 }
 
 // ToObject upcasts f to an Object.
@@ -154,7 +154,7 @@ func newStaticMethod(callable *Object) *staticMethod {
 }
 
 func toStaticMethodUnsafe(o *Object) *staticMethod {
-	return (*staticMethod)(o.toPointer())
+	return o.self.(*staticMethod)
 }
 
 // ToObject upcasts f to an Object.
@@ -196,7 +196,7 @@ func newClassMethod(callable *Object) *classMethod {
 }
 
 func toClassMethodUnsafe(o *Object) *classMethod {
-	return (*classMethod)(o.toPointer())
+	return o.self.(*classMethod)
 }
 
 // ToObject upcasts f to an Object.

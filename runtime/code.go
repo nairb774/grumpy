@@ -52,7 +52,7 @@ func NewCode(name, filename string, params []Param, flags CodeFlag, fn func(*Fra
 }
 
 func toCodeUnsafe(o *Object) *Code {
-	return (*Code)(o.toPointer())
+	return o.self.(*Code)
 }
 
 // Eval runs the code object c in the context of the given globals.

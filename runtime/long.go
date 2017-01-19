@@ -59,7 +59,7 @@ func NewLongFromBytes(b []byte) *Long {
 }
 
 func toLongUnsafe(o *Object) *Long {
-	return (*Long)(o.toPointer())
+	return o.self.(*Long)
 }
 
 // IntValue returns l's value as a plain int if it will not overflow.

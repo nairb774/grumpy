@@ -64,7 +64,14 @@ type nativeMetaclass struct {
 }
 
 func toNativeMetaclassUnsafe(o *Object) *nativeMetaclass {
-	return (*nativeMetaclass)(o.toPointer())
+	switch t := o.self.(type) {
+	case *nativeMetaclass:
+		return t
+	case *nativeBoolMetaclass:
+		return &t.nativeMetaclass
+	default:
+		return o.self.(*nativeMetaclass)
+	}
 }
 
 func newNativeType(rtype reflect.Type, base *Type) *Type {
@@ -117,7 +124,7 @@ type nativeBoolMetaclass struct {
 }
 
 func toNativeBoolMetaclassUnsafe(o *Object) *nativeBoolMetaclass {
-	return (*nativeBoolMetaclass)(o.toPointer())
+	return o.self.(*nativeBoolMetaclass)
 }
 
 func newNativeBoolType(rtype reflect.Type) *Type {
@@ -183,7 +190,7 @@ type native struct {
 }
 
 func toNativeUnsafe(o *Object) *native {
-	return (*native)(o.toPointer())
+	return o.self.(*native)
 }
 
 // ToObject upcasts n to an Object.
@@ -254,7 +261,7 @@ func newSliceIterator(slice reflect.Value) *Object {
 }
 
 func toSliceIteratorUnsafe(o *Object) *sliceIterator {
-	return (*sliceIterator)(o.toPointer())
+	return o.self.(*sliceIterator)
 }
 
 func sliceIteratorIter(f *Frame, o *Object) (*Object, *BaseException) {

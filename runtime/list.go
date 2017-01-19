@@ -45,7 +45,7 @@ func NewList(elems ...*Object) *List {
 }
 
 func toListUnsafe(o *Object) *List {
-	return (*List)(o.toPointer())
+	return o.self.(*List)
 }
 
 // ToObject upcasts l to an Object.
@@ -508,7 +508,7 @@ func newListIterator(l *List) *Object {
 }
 
 func toListIteratorUnsafe(o *Object) *listIterator {
-	return (*listIterator)(o.toPointer())
+	return o.self.(*listIterator)
 }
 
 var listIteratorType = newBasisType("listiterator", reflect.TypeOf(listIterator{}), toListIteratorUnsafe, ObjectType)
