@@ -17,7 +17,6 @@ package grumpy
 import (
 	"fmt"
 	"reflect"
-	"unsafe"
 )
 
 var (
@@ -110,10 +109,6 @@ func (o *Object) Type() *Type {
 	return o.typ
 }
 
-func (o *Object) toPointer() unsafe.Pointer {
-	return unsafe.Pointer(o)
-}
-
 func (o *Object) isInstance(t *Type) bool {
 	return o.typ.isSubclass(t)
 }
@@ -181,7 +176,7 @@ func objectGetAttribute(f *Frame, o *Object, name *Str) (*Object, *BaseException
 }
 
 func objectHash(f *Frame, o *Object) (*Object, *BaseException) {
-	return NewInt(int(uintptr(o.toPointer()))).ToObject(), nil
+	return NewInt(int(reflect.ValueOf(o).Pointer())).ToObject(), nil
 }
 
 func objectNew(f *Frame, t *Type, _ Args, _ KWArgs) (*Object, *BaseException) {

@@ -1082,7 +1082,7 @@ func tryRichCompare(f *Frame, op compareOp, v, w *Object) (*Object, *BaseExcepti
 // closely resembles the behavior of CPython's default_3way_compare in object.c.
 func compareDefault(f *Frame, v, w *Object) int {
 	if v.typ == w.typ {
-		pv, pw := uintptr(v.toPointer()), uintptr(w.toPointer())
+		pv, pw := reflect.ValueOf(v).Pointer(), reflect.ValueOf(w).Pointer()
 		if pv < pw {
 			return -1
 		}
@@ -1106,7 +1106,7 @@ func compareDefault(f *Frame, v, w *Object) int {
 	if v.typ.Name() != w.typ.Name() {
 		return 1
 	}
-	if uintptr(v.typ.toPointer()) < uintptr(w.typ.toPointer()) {
+	if reflect.ValueOf(v.typ).Pointer() < reflect.ValueOf(w.typ).Pointer() {
 		return -1
 	}
 	return 1
