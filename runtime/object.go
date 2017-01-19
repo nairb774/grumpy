@@ -40,6 +40,7 @@ var (
 type Object struct {
 	typ  *Type `attr:"__class__"`
 	dict *Dict `attr:"__dict__"`
+	self interface{}
 	ref  *WeakRef
 }
 
