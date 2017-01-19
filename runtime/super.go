@@ -30,6 +30,8 @@ type super struct {
 	objType *Type
 }
 
+func (s *super) ToObject() *Object { return &s.Object }
+
 func toSuperUnsafe(o *Object) *super {
 	return o.self.(*super)
 }

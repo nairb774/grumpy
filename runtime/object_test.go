@@ -368,6 +368,10 @@ func TestObjectSetAttr(t *testing.T) {
 	}
 }
 
+type noReprMethodBasis struct{ Object }
+
+func (n *noReprMethodBasis) ToObject() *Object { return &n.Object }
+
 func TestObjectStrRepr(t *testing.T) {
 	fun := wrapFuncForTest(func(f *Frame, o *Object, wantPattern string) *BaseException {
 		re := regexp.MustCompile(wantPattern)
@@ -387,7 +391,6 @@ func TestObjectStrRepr(t *testing.T) {
 		}
 		return nil
 	})
-	type noReprMethodBasis struct{ Object }
 	noReprMethodType := newType(TypeType, "noReprMethod", reflect.TypeOf(noReprMethodBasis{}), []*Type{}, NewDict())
 	noReprMethodType.mro = []*Type{noReprMethodType}
 	fooType := newTestClass("Foo", []*Type{ObjectType}, newTestDict("__module__", "foo.bar"))

@@ -43,6 +43,8 @@ type Code struct {
 	fn        func(*Frame, []*Object) (*Object, *BaseException)
 }
 
+func (c *Code) ToObject() *Object { return &c.Object }
+
 // NewCode creates a new Code object that executes the given fn.
 func NewCode(name, filename string, params []Param, flags CodeFlag, fn func(*Frame, []*Object) (*Object, *BaseException)) *Code {
 	s := NewParamSpec(name, params, flags&CodeFlagVarArg != 0, flags&CodeFlagKWArg != 0)

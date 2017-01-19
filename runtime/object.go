@@ -40,6 +40,10 @@ func init() {
 	ObjectType.self = ObjectType
 }
 
+type toObjecter interface {
+	ToObject() *Object
+}
+
 // Object represents Python 'object' objects.
 type Object struct {
 	typ  *Type `attr:"__class__"`
@@ -53,11 +57,24 @@ func newObject(t *Type) *Object {
 	if t != ObjectType {
 		dict = NewDict()
 	}
-	outside := reflect.New(t.basis)
-	o := (*Object)(unsafe.Pointer(outside.Pointer()))
+
+	outside := reflect.New(t.basis).Interface()
+
+	var o *Object
+	switch outside := outside.(type) {
+	case *Object:
+		o = outside
+
+	case toObjecter:
+		o = outside.ToObject()
+
+	default:
+		o = outside.(toObjecter).ToObject() // Will panic.
+	}
+
 	o.typ = t
 	o.dict = dict
-	o.self = outside.Interface()
+	o.self = outside
 	return o
 }
 

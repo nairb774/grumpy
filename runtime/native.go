@@ -396,7 +396,23 @@ func WrapNative(f *Frame, v reflect.Value) (*Object, *BaseException) {
 		if basis := v.Elem(); basisTypes[basis.Type()] != nil {
 			// We have a basis type that is binary compatible with
 			// Object.
-			return (*Object)(unsafe.Pointer(basis.UnsafeAddr())), nil
+			if !v.CanInterface() {
+				// In the event we got here with an un-exported field, just force
+				// convert it.
+				// TODO: Find a better/safer solution.
+				return (*Object)(unsafe.Pointer(basis.UnsafeAddr())), nil
+			}
+
+			switch o := v.Interface().(type) {
+			case *Object:
+				return o, nil
+
+			case toObjecter:
+				return o.ToObject(), nil
+
+			default:
+				return o.(toObjecter).ToObject(), nil
+			}
 		}
 	case reflect.Struct:
 		if i, ok := v.Interface().(big.Int); ok {

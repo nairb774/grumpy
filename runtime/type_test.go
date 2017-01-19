@@ -57,8 +57,11 @@ func TestNewClass(t *testing.T) {
 	}
 }
 
+type basisStruct struct{ Object }
+
+func (b *basisStruct) ToObject() *Object { return &b.Object }
+
 func TestNewBasisType(t *testing.T) {
-	type basisStruct struct{ Object }
 	basisStructFunc := func(o *Object) *basisStruct { return o.self.(*basisStruct) }
 	basis := reflect.TypeOf(basisStruct{})
 	typ := newBasisType("Foo", basis, basisStructFunc, ObjectType)
