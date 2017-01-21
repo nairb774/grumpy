@@ -479,22 +479,95 @@ func maybeConvertValue(f *Frame, o *Object, expectedRType reflect.Type) (reflect
 	if raised != nil {
 		return reflect.Value{}, raised
 	}
-	rtype := val.Type()
 	for {
+		rtype := val.Type()
 		if rtype == expectedRType {
 			return val, nil
 		}
 		if rtype.ConvertibleTo(expectedRType) {
 			return val.Convert(expectedRType), nil
 		}
-		if rtype.Kind() == reflect.Ptr {
+		switch rtype.Kind() {
+		case reflect.Ptr:
 			val = val.Elem()
-			rtype = val.Type()
 			continue
+
+		case reflect.Func:
+			if fn, ok := val.Interface().(func(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException)); ok {
+				val = nativeToPyFuncBridge(Func(fn), expectedRType)
+				continue
+			}
 		}
-		break
+		return val, f.RaiseType(TypeErrorType, fmt.Sprintf("cannot convert %s to %s", rtype, expectedRType))
 	}
-	return reflect.Value{}, f.RaiseType(TypeErrorType, fmt.Sprintf("cannot convert %s to %s", rtype, expectedRType))
+}
+
+func nativeToPyFuncBridge(fn Func, target reflect.Type) reflect.Value {
+	firstInIsFrame := target.NumIn() > 0 && target.In(0) == reflect.TypeOf((*Frame)(nil))
+
+	outs := make([]reflect.Type, target.NumOut())
+	for i := range outs {
+		outs[i] = target.Out(i)
+	}
+
+	return reflect.MakeFunc(target, func(args []reflect.Value) []reflect.Value {
+		var frame *Frame
+		if firstInIsFrame {
+			frame, args = args[0].Interface().(*Frame), args[1:]
+		} else {
+			frame = NewRootFrame()
+		}
+
+		pyArgs := frame.MakeArgs(len(args))
+		for i, arg := range args {
+			var raised *BaseException
+			pyArgs[i], raised = WrapNative(frame, arg)
+			if raised != nil {
+				panic(fmt.Sprintf("WrapNative(%v)=%v", arg, raised)) // TODO: Figure this out...
+			}
+		}
+
+		ret, raised := fn(frame, pyArgs, nil)
+		if raised != nil {
+			panic(fmt.Sprintf("python error %v crossing into Go", raised)) // TODO: Figure this out...
+		}
+
+		switch len(outs) {
+		case 0:
+			if ret != nil && ret != None {
+				panic(fmt.Sprintf("unexpected return of %v when None expected", ret)) // TODO: Figure this out...
+			}
+			return nil
+
+		case 1:
+			v, raised := maybeConvertValue(frame, ret, outs[0])
+			if raised != nil {
+				panic(fmt.Sprintf("maybeConvertValue(%v)=%v", ret, raised)) // TODO: Figure this out...
+			}
+			return []reflect.Value{v}
+		}
+
+		// TODO: Support other iterables?
+		if !ret.isInstance(TupleType) {
+			panic(fmt.Sprintf("return value %v is not a tuple", ret)) // TODO
+		}
+
+		retTuple := toTupleUnsafe(ret)
+		if retTuple.Len() != len(outs) {
+			panic(fmt.Sprintf("return value has wrong length %v, want %v", retTuple.Len(), len(outs))) // TODO
+		}
+
+		converted := make([]reflect.Value, len(outs))
+		for i, out := range outs {
+			var raised *BaseException
+			converted[i], raised = maybeConvertValue(frame, retTuple.GetItem(i), out)
+			if raised != nil {
+				panic(fmt.Sprintf("maybeConvertValue(%v)=%v", retTuple.GetItem(i), raised)) // TODO: Figure this out...
+			}
+		}
+
+		return converted
+	})
 }
 
 func nativeFuncTypeName(rtype reflect.Type) string {
