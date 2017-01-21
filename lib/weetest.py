@@ -40,6 +40,12 @@ import sys
 import time
 import traceback
 
+GoBenchmark = None
+try:
+  from __go__.testing import Benchmark as GoBenchmark
+except:
+  pass
+
 
 # pylint: disable=invalid-name
 class _Benchmark(object):
@@ -92,7 +98,7 @@ class _TestResult(object):
     self.properties = {}
 
 
-def _RunOneBenchmark(name, test_func):
+def _RunOnePyBenchmark(name, test_func):
   """Runs a single benchmark and returns a _TestResult."""
   b = _Benchmark(test_func, 1)
   result = _TestResult(name)
@@ -112,6 +118,21 @@ def _RunOneBenchmark(name, test_func):
   finally:
     result.duration = time.time() - start_time
   return result
+
+
+def _RunOneGoBenchmark(name, test_func):
+  r = GoBenchmark(test_func)
+  print name, r.String(), r.MemString()
+  result = _TestResult(name)
+  result.duration = r.T / 1E9
+  result.status = 'passed'
+  return result
+
+
+if GoBenchmark:
+  _RunOneBenchmark = _RunOneGoBenchmark
+else:
+  _RunOneBenchmark = _RunOnePyBenchmark
 
 
 def _RunOneTest(name, test_func):

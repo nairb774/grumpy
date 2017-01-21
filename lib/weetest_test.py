@@ -19,6 +19,9 @@ import time
 
 import weetest
 
+if weetest._RunOneBenchmark == weetest._RunOneGoBenchmark:
+  weetest._RunOneBenchmark = weetest._RunOnePyBenchmark
+
 
 class _Timer(object):
 
