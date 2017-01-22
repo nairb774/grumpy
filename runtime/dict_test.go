@@ -211,7 +211,7 @@ func TestDictGetItem(t *testing.T) {
 	if raised != nil {
 		t.Fatal(raised)
 	}
-	if b, raised := IsTrue(f, mustNotRaise(NE(f, h.ToObject(), hashFoo))); raised != nil {
+	if b, raised := IsTrue(f, mustNotRaise(NE(f, NewInt(h).ToObject(), hashFoo))); raised != nil {
 		t.Fatal(raised)
 	} else if b {
 		t.Fatalf("hash('foo') = %v, want %v", h, hashFoo)

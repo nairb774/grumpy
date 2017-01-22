@@ -149,7 +149,7 @@ func longHex(f *Frame, o *Object) (*Object, *BaseException) {
 	return NewStr(val).ToObject(), nil
 }
 
-func longHash(f *Frame, o *Object) (*Object, *BaseException) {
+func longHash(f *Frame, o *Object) (int, *BaseException) {
 	l := toLongUnsafe(o)
 	l.hashOnce.Do(func() {
 		// Be compatible with int hashes.
@@ -158,7 +158,7 @@ func longHash(f *Frame, o *Object) (*Object, *BaseException) {
 		}
 		l.hash = hashBigInt(&l.value)
 	})
-	return NewInt(l.hash).ToObject(), nil
+	return l.hash, nil
 }
 
 func longIndex(_ *Frame, o *Object) (*Object, *BaseException) {
@@ -341,7 +341,7 @@ func initLongType(dict map[string]*Object) {
 	LongType.slots.Float = &unaryOpSlot{longFloat}
 	LongType.slots.GE = longBinaryBoolOpSlot(longGE)
 	LongType.slots.GT = longBinaryBoolOpSlot(longGT)
-	LongType.slots.Hash = &unaryOpSlot{longHash}
+	LongType.slots.Hash = longHash
 	LongType.slots.Hex = &unaryOpSlot{longHex}
 	LongType.slots.Index = &unaryOpSlot{longIndex}
 	LongType.slots.Int = &unaryOpSlot{longInt}

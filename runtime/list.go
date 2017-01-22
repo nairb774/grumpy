@@ -478,7 +478,7 @@ func initListType(dict map[string]*Object) {
 	ListType.slots.GE = &binaryOpSlot{listGE}
 	ListType.slots.GetItem = &binaryOpSlot{listGetItem}
 	ListType.slots.GT = &binaryOpSlot{listGT}
-	ListType.slots.Hash = &unaryOpSlot{hashNotImplemented}
+	ListType.slots.Hash = hashNotImplemented
 	ListType.slots.IAdd = &binaryOpSlot{listIAdd}
 	ListType.slots.IMul = &binaryOpSlot{listIMul}
 	ListType.slots.Iter = &unaryOpSlot{listIter}

@@ -346,7 +346,7 @@ func (d *Dict) GetItem(f *Frame, key *Object) (*Object, *BaseException) {
 	if raised != nil {
 		return nil, raised
 	}
-	_, entry, raised := d.loadTable().lookupEntry(f, hash.Value(), key)
+	_, entry, raised := d.loadTable().lookupEntry(f, hash, key)
 	if raised != nil {
 		return nil, raised
 	}
@@ -398,7 +398,7 @@ func (d *Dict) putItem(f *Frame, key, value *Object) (*Object, *BaseException) {
 	d.mutex.Lock(f)
 	t := d.table
 	v := d.version
-	index, entry, raised := t.lookupEntry(f, hash.Value(), key)
+	index, entry, raised := t.lookupEntry(f, hash, key)
 	var originValue *Object
 	if raised == nil {
 		if v != d.version {
@@ -414,7 +414,7 @@ func (d *Dict) putItem(f *Frame, key, value *Object) (*Object, *BaseException) {
 					d.incVersion()
 				}
 			} else {
-				newEntry := &dictEntry{hash.Value(), key, value}
+				newEntry := &dictEntry{hash, key, value}
 				if newTable, ok := t.writeEntry(f, index, newEntry); ok {
 					if newTable != nil {
 						d.storeTable(newTable)
@@ -809,7 +809,7 @@ func initDictType(dict map[string]*Object) {
 	DictType.slots.DelItem = &delItemSlot{dictDelItem}
 	DictType.slots.Eq = &binaryOpSlot{dictEq}
 	DictType.slots.GetItem = &binaryOpSlot{dictGetItem}
-	DictType.slots.Hash = &unaryOpSlot{hashNotImplemented}
+	DictType.slots.Hash = hashNotImplemented
 	DictType.slots.Init = &initSlot{dictInit}
 	DictType.slots.Iter = &unaryOpSlot{dictIter}
 	DictType.slots.Len = &unaryOpSlot{dictLen}

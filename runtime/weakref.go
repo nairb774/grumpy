@@ -43,7 +43,7 @@ type WeakRef struct {
 	mutex     sync.Mutex
 	state     weakRefState
 	callbacks []*Object
-	hash      *Object
+	hash      *int
 }
 
 func toWeakRefUnsafe(o *Object) *WeakRef {
@@ -78,29 +78,29 @@ func weakRefCall(f *Frame, callable *Object, args Args, _ KWArgs) (*Object, *Bas
 	return o, nil
 }
 
-func weakRefHash(f *Frame, o *Object) (result *Object, raised *BaseException) {
+func weakRefHash(f *Frame, o *Object) (int, *BaseException) {
 	r := toWeakRefUnsafe(o)
+	var hash *int
 	var referent *Object
 	r.mutex.Lock()
 	if r.hash != nil {
-		result = r.hash
+		hash = r.hash
 	} else {
 		referent = r.get()
 	}
 	r.mutex.Unlock()
 	if referent != nil {
-		var hash *Int
-		hash, raised = Hash(f, referent)
+		hash, raised := Hash(f, referent)
 		if raised == nil {
-			result = hash.ToObject()
 			r.mutex.Lock()
-			r.hash = result
+			r.hash = &hash
 			r.mutex.Unlock()
 		}
-	} else if result == nil {
-		raised = f.RaiseType(TypeErrorType, "weak object has gone away")
+		return hash, raised
+	} else if hash == nil {
+		return 0, f.RaiseType(TypeErrorType, "weak object has gone away")
 	}
-	return result, raised
+	return *hash, nil
 }
 
 func weakRefNew(f *Frame, t *Type, args Args, _ KWArgs) (*Object, *BaseException) {
@@ -152,7 +152,7 @@ func weakRefRepr(f *Frame, o *Object) (*Object, *BaseException) {
 
 func initWeakRefType(map[string]*Object) {
 	WeakRefType.slots.Call = &callSlot{weakRefCall}
-	WeakRefType.slots.Hash = &unaryOpSlot{weakRefHash}
+	WeakRefType.slots.Hash = weakRefHash
 	WeakRefType.slots.New = &newSlot{weakRefNew}
 	WeakRefType.slots.Repr = &unaryOpSlot{weakRefRepr}
 }

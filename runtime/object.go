@@ -156,8 +156,8 @@ func objectGetAttribute(f *Frame, o *Object, name *Str) (*Object, *BaseException
 	return nil, f.RaiseType(AttributeErrorType, fmt.Sprintf(format, o.typ.Name(), name.Value()))
 }
 
-func objectHash(f *Frame, o *Object) (*Object, *BaseException) {
-	return NewInt(int(uintptr(o.toPointer()))).ToObject(), nil
+func objectHash(f *Frame, o *Object) (int, *BaseException) {
+	return int(uintptr(o.toPointer())), nil
 }
 
 func objectNew(f *Frame, t *Type, _ Args, _ KWArgs) (*Object, *BaseException) {
@@ -222,7 +222,7 @@ func initObjectType(dict map[string]*Object) {
 	dict["__reduce_ex__"] = newBuiltinFunction("__reduce_ex__", objectReduceEx).ToObject()
 	ObjectType.slots.DelAttr = &delAttrSlot{objectDelAttr}
 	ObjectType.slots.GetAttribute = &getAttributeSlot{objectGetAttribute}
-	ObjectType.slots.Hash = &unaryOpSlot{objectHash}
+	ObjectType.slots.Hash = objectHash
 	ObjectType.slots.New = &newSlot{objectNew}
 	ObjectType.slots.SetAttr = &setAttrSlot{objectSetAttr}
 }

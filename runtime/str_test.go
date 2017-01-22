@@ -23,7 +23,7 @@ import (
 )
 
 func TestNewStr(t *testing.T) {
-	expected := &Str{Object: Object{typ: StrType}, value: "foo"}
+	expected := &Str{Object: Object{typ: StrType}, value: "foo", hash: -1}
 	s := NewStr("foo")
 	if !reflect.DeepEqual(s, expected) {
 		t.Errorf(`NewStr("foo") = %+v, expected %+v`, *s, *expected)

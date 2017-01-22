@@ -235,20 +235,13 @@ func GT(f *Frame, v, w *Object) (*Object, *BaseException) {
 }
 
 // Hash returns the hash of o according to its __hash__ operator.
-func Hash(f *Frame, o *Object) (*Int, *BaseException) {
+func Hash(f *Frame, o *Object) (int, *BaseException) {
 	hash := o.typ.slots.Hash
 	if hash == nil {
 		_, raised := hashNotImplemented(f, o)
-		return nil, raised
+		return 0, raised
 	}
-	h, raised := hash.Fn(f, o)
-	if raised != nil {
-		return nil, raised
-	}
-	if !h.isInstance(IntType) {
-		return nil, f.RaiseType(TypeErrorType, "an integer is required")
-	}
-	return toIntUnsafe(h), nil
+	return hash(f, o)
 }
 
 // Hex returns the result of o.__hex__ if defined.
@@ -1231,8 +1224,8 @@ func checkMethodVarArgs(f *Frame, method string, args Args, types ...*Type) *Bas
 	return checkMethodArgs(f, method, args[:len(types)], types...)
 }
 
-func hashNotImplemented(f *Frame, o *Object) (*Object, *BaseException) {
-	return nil, f.RaiseType(TypeErrorType, fmt.Sprintf("unhashable type: '%s'", o.typ.Name()))
+func hashNotImplemented(f *Frame, o *Object) (int, *BaseException) {
+	return 0, f.RaiseType(TypeErrorType, fmt.Sprintf("unhashable type: '%s'", o.typ.Name()))
 }
 
 // pyPrint encapsulates the logic of the Python print function.

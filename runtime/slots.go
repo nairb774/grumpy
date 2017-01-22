@@ -361,6 +361,35 @@ func (s *unaryOpSlot) wrapCallable(callable *Object) bool {
 	return true
 }
 
+type hashSlot func(*Frame, *Object) (int, *BaseException)
+
+func (h hashSlot) makeCallable(t *Type, slotName string) *Object {
+	return newBuiltinFunction(slotName, func(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
+		if raised := checkMethodArgs(f, slotName, args, t); raised != nil {
+			return nil, raised
+		}
+		ret, raised := h(f, args[0])
+		if raised != nil {
+			return nil, raised
+		}
+		return NewInt(ret).ToObject(), nil
+	}).ToObject()
+}
+
+func (s *hashSlot) wrapCallable(callable *Object) bool {
+	*s = func(f *Frame, o *Object) (int, *BaseException) {
+		ret, raised := callable.Call(f, Args{o}, nil)
+		if raised != nil {
+			return 0, raised
+		}
+		if !ret.isInstance(IntType) {
+			return 0, f.RaiseType(TypeErrorType, "an integer is required")
+		}
+		return toIntUnsafe(ret).Value(), nil
+	}
+	return true
+}
+
 // typeSlots hold a type's special methods such as __eq__. During type
 // initialization, any field that is not set for that type will be inherited
 // according to the type's MRO. Therefore, any given field will be nil only if
@@ -387,7 +416,7 @@ type typeSlots struct {
 	GetAttribute *getAttributeSlot
 	GetItem      *binaryOpSlot
 	GT           *binaryOpSlot
-	Hash         *unaryOpSlot
+	Hash         hashSlot
 	Hex          *unaryOpSlot
 	IAdd         *binaryOpSlot
 	IAnd         *binaryOpSlot

@@ -114,8 +114,8 @@ func intFloat(f *Frame, o *Object) (*Object, *BaseException) {
 	return NewFloat(float64(i)).ToObject(), nil
 }
 
-func intHash(f *Frame, o *Object) (*Object, *BaseException) {
-	return o, nil
+func intHash(f *Frame, o *Object) (int, *BaseException) {
+	return toIntUnsafe(o).Value(), nil
 }
 
 func intHex(f *Frame, o *Object) (*Object, *BaseException) {
@@ -374,7 +374,7 @@ func initIntType(dict map[string]*Object) {
 	IntType.slots.GE = &binaryOpSlot{intGE}
 	IntType.slots.GT = &binaryOpSlot{intGT}
 	IntType.slots.Float = &unaryOpSlot{intFloat}
-	IntType.slots.Hash = &unaryOpSlot{intHash}
+	IntType.slots.Hash = intHash
 	IntType.slots.Hex = &unaryOpSlot{intHex}
 	IntType.slots.Index = &unaryOpSlot{intIndex}
 	IntType.slots.Int = &unaryOpSlot{intInt}

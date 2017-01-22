@@ -250,7 +250,7 @@ func initSetType(dict map[string]*Object) {
 	SetType.slots.Eq = &binaryOpSlot{setEq}
 	SetType.slots.GE = &binaryOpSlot{setGE}
 	SetType.slots.GT = &binaryOpSlot{setGT}
-	SetType.slots.Hash = &unaryOpSlot{hashNotImplemented}
+	SetType.slots.Hash = hashNotImplemented
 	SetType.slots.Init = &initSlot{setInit}
 	SetType.slots.Iter = &unaryOpSlot{setIter}
 	SetType.slots.LE = &binaryOpSlot{setLE}
@@ -367,7 +367,7 @@ func initFrozenSetType(dict map[string]*Object) {
 	FrozenSetType.slots.GE = &binaryOpSlot{frozenSetGE}
 	FrozenSetType.slots.GT = &binaryOpSlot{frozenSetGT}
 	// TODO: Implement hash for frozenset.
-	FrozenSetType.slots.Hash = &unaryOpSlot{hashNotImplemented}
+	FrozenSetType.slots.Hash = hashNotImplemented
 	FrozenSetType.slots.Iter = &unaryOpSlot{frozenSetIter}
 	FrozenSetType.slots.LE = &binaryOpSlot{frozenSetLE}
 	FrozenSetType.slots.Len = &unaryOpSlot{frozenSetLen}

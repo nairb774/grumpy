@@ -77,9 +77,15 @@ func newClass(f *Frame, meta *Type, name string, bases []*Type, dict *Dict) (*Ty
 		}
 		if dictFunc != nil {
 			slotField := slotsValue.Field(i)
-			slotValue := reflect.New(slotField.Type().Elem())
-			if slotValue.Interface().(slot).wrapCallable(dictFunc) {
-				slotField.Set(slotValue)
+			switch slotField.Kind() {
+			case reflect.Ptr:
+				slotValue := reflect.New(slotField.Type().Elem())
+				if slotValue.Interface().(slot).wrapCallable(dictFunc) {
+					slotField.Set(slotValue)
+				}
+
+			case reflect.Func:
+				slotField.Addr().Interface().(slot).wrapCallable(dictFunc)
 			}
 		}
 	}
@@ -159,9 +165,13 @@ func prepareBuiltinType(typ *Type, init builtinTypeInit) {
 	}
 	// Create dict entries for slot methods.
 	slotsValue := reflect.ValueOf(&typ.slots).Elem()
+	slotType := reflect.TypeOf((*slot)(nil)).Elem()
 	for i := 0; i < numSlots; i++ {
 		slotField := slotsValue.Field(i)
 		if !slotField.IsNil() {
+			if !slotField.Type().ConvertibleTo(slotType) {
+				slotField = slotField.Addr()
+			}
 			slot := slotField.Interface().(slot)
 			if fun := slot.makeCallable(typ, slotNames[i]); fun != nil {
 				dict[slotNames[i]] = fun

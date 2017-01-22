@@ -197,11 +197,11 @@ func unicodeGT(f *Frame, v, w *Object) (*Object, *BaseException) {
 	return unicodeCompare(f, toUnicodeUnsafe(v), w, False, False, True)
 }
 
-func unicodeHash(f *Frame, o *Object) (*Object, *BaseException) {
+func unicodeHash(f *Frame, o *Object) (int, *BaseException) {
 	s := toUnicodeUnsafe(o).Value()
 	l := len(s)
 	if l == 0 {
-		return NewInt(0).ToObject(), nil
+		return 0, nil
 	}
 	h := int(s[0]) << 7
 	for _, r := range s {
@@ -211,7 +211,7 @@ func unicodeHash(f *Frame, o *Object) (*Object, *BaseException) {
 	if h == -1 {
 		h = -2
 	}
-	return NewInt(h).ToObject(), nil
+	return h, nil
 }
 
 func unicodeJoin(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {
@@ -421,7 +421,7 @@ func initUnicodeType(dict map[string]*Object) {
 	UnicodeType.slots.GE = &binaryOpSlot{unicodeGE}
 	UnicodeType.slots.GetItem = &binaryOpSlot{unicodeGetItem}
 	UnicodeType.slots.GT = &binaryOpSlot{unicodeGT}
-	UnicodeType.slots.Hash = &unaryOpSlot{unicodeHash}
+	UnicodeType.slots.Hash = unicodeHash
 	UnicodeType.slots.LE = &binaryOpSlot{unicodeLE}
 	UnicodeType.slots.Len = &unaryOpSlot{unicodeLen}
 	UnicodeType.slots.LT = &binaryOpSlot{unicodeLT}

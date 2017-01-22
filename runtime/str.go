@@ -51,7 +51,7 @@ const (
 func InternStr(s string) *Str {
 	str, _ := internedStrs[s]
 	if str == nil {
-		str = &Str{Object: Object{typ: StrType}, value: s, hash: NewInt(hashString(s))}
+		str = &Str{Object: Object{typ: StrType}, value: s, hash: int64(hashString(s))}
 		internedStrs[s] = str
 	}
 	return str
@@ -61,7 +61,7 @@ func InternStr(s string) *Str {
 type Str struct {
 	Object
 	value string
-	hash  *Int
+	hash  int64
 }
 
 // NewStr returns a new Str holding the given string value.
@@ -69,7 +69,7 @@ func NewStr(value string) *Str {
 	if s := internedStrs[value]; s != nil {
 		return s
 	}
-	return &Str{Object: Object{typ: StrType}, value: value}
+	return &Str{Object: Object{typ: StrType}, value: value, hash: -1}
 }
 
 func toStrUnsafe(o *Object) *Str {
@@ -324,15 +324,18 @@ func strGT(f *Frame, v, w *Object) (*Object, *BaseException) {
 	return strCompare(v, w, False, False, True), nil
 }
 
-func strHash(f *Frame, o *Object) (*Object, *BaseException) {
+func strHash(f *Frame, o *Object) (int, *BaseException) {
 	s := toStrUnsafe(o)
-	p := (*unsafe.Pointer)(unsafe.Pointer(&s.hash))
-	if v := atomic.LoadPointer(p); v != unsafe.Pointer(nil) {
-		return (*Int)(v).ToObject(), nil
+	// 64bit atomic ops need to be 8 byte aligned. This compile time check
+	// verifies alignment by creating a negative constant for an unsigned
+	// type.  See sync/atomic docs for details.
+	const _ = -(unsafe.Offsetof(s.hash) % 8)
+	if v := atomic.LoadInt64(&s.hash); v != -1 {
+		return int(v), nil
 	}
-	h := NewInt(hashString(toStrUnsafe(o).Value()))
-	atomic.StorePointer(p, unsafe.Pointer(h))
-	return h.ToObject(), nil
+	h := hashString(toStrUnsafe(o).Value())
+	atomic.StoreInt64(&s.hash, int64(h))
+	return h, nil
 }
 
 func strIsAlNum(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
@@ -937,7 +940,7 @@ func initStrType(dict map[string]*Object) {
 	StrType.slots.GE = &binaryOpSlot{strGE}
 	StrType.slots.GetItem = &binaryOpSlot{strGetItem}
 	StrType.slots.GT = &binaryOpSlot{strGT}
-	StrType.slots.Hash = &unaryOpSlot{strHash}
+	StrType.slots.Hash = strHash
 	StrType.slots.LE = &binaryOpSlot{strLE}
 	StrType.slots.Len = &unaryOpSlot{strLen}
 	StrType.slots.LT = &binaryOpSlot{strLT}

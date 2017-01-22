@@ -411,7 +411,7 @@ func builtinHash(f *Frame, args Args, kwargs KWArgs) (*Object, *BaseException) {
 	if raised != nil {
 		return nil, raised
 	}
-	return h.ToObject(), nil
+	return NewInt(h).ToObject(), nil
 }
 
 func builtinHex(f *Frame, args Args, _ KWArgs) (*Object, *BaseException) {

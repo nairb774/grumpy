@@ -148,7 +148,7 @@ func initSliceType(map[string]*Object) {
 	SliceType.slots.Eq = &binaryOpSlot{sliceEq}
 	SliceType.slots.GE = &binaryOpSlot{sliceGE}
 	SliceType.slots.GT = &binaryOpSlot{sliceGT}
-	SliceType.slots.Hash = &unaryOpSlot{hashNotImplemented}
+	SliceType.slots.Hash = hashNotImplemented
 	SliceType.slots.LE = &binaryOpSlot{sliceLE}
 	SliceType.slots.LT = &binaryOpSlot{sliceLT}
 	SliceType.slots.NE = &binaryOpSlot{sliceNE}
