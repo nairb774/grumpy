@@ -246,7 +246,7 @@ func longNew(f *Frame, t *Type, args Args, _ KWArgs) (*Object, *BaseException) {
 			if raised != nil {
 				return nil, raised
 			}
-			if !result.isInstance(LongType) {
+			if _, ok := result.self.(*Long); !ok || !result.isInstance(LongType) {
 				format := "__long__ returned non-long (type %s)"
 				return nil, f.RaiseType(TypeErrorType, fmt.Sprintf(format, result.typ.Name()))
 			}
@@ -443,7 +443,9 @@ func longUnaryBoolOpSlot(fun func(x *big.Int) bool) *unaryOpSlot {
 
 func longBinaryOpSlot(fun func(z, x, y *big.Int)) *binaryOpSlot {
 	f := func(_ *Frame, v, w *Object) (*Object, *BaseException) {
-		if w.isInstance(IntType) {
+		if i, ok := w.self.(*Int); ok {
+			w = intToLong(i).ToObject()
+		} else if w.isInstance(IntType) {
 			w = intToLong(toIntUnsafe(w)).ToObject()
 		} else if !w.isInstance(LongType) {
 			return NotImplemented, nil
@@ -455,7 +457,9 @@ func longBinaryOpSlot(fun func(z, x, y *big.Int)) *binaryOpSlot {
 
 func longRBinaryOpSlot(fun func(z, x, y *big.Int)) *binaryOpSlot {
 	f := func(_ *Frame, v, w *Object) (*Object, *BaseException) {
-		if w.isInstance(IntType) {
+		if i, ok := w.self.(*Int); ok {
+			w = intToLong(i).ToObject()
+		} else if w.isInstance(IntType) {
 			w = intToLong(toIntUnsafe(w)).ToObject()
 		} else if !w.isInstance(LongType) {
 			return NotImplemented, nil
@@ -467,7 +471,9 @@ func longRBinaryOpSlot(fun func(z, x, y *big.Int)) *binaryOpSlot {
 
 func longDivModOpSlot(fun func(z, x, y *big.Int)) *binaryOpSlot {
 	f := func(f *Frame, v, w *Object) (*Object, *BaseException) {
-		if w.isInstance(IntType) {
+		if i, ok := w.self.(*Int); ok {
+			w = intToLong(i).ToObject()
+		} else if w.isInstance(IntType) {
 			w = intToLong(toIntUnsafe(w)).ToObject()
 		} else if !w.isInstance(LongType) {
 			return NotImplemented, nil
@@ -479,7 +485,9 @@ func longDivModOpSlot(fun func(z, x, y *big.Int)) *binaryOpSlot {
 
 func longRDivModOpSlot(fun func(z, x, y *big.Int)) *binaryOpSlot {
 	f := func(f *Frame, v, w *Object) (*Object, *BaseException) {
-		if w.isInstance(IntType) {
+		if i, ok := w.self.(*Int); ok {
+			w = intToLong(i).ToObject()
+		} else if w.isInstance(IntType) {
 			w = intToLong(toIntUnsafe(w)).ToObject()
 		} else if !w.isInstance(LongType) {
 			return NotImplemented, nil
@@ -491,7 +499,9 @@ func longRDivModOpSlot(fun func(z, x, y *big.Int)) *binaryOpSlot {
 
 func longShiftOpSlot(fun func(z, x *big.Int, n uint)) *binaryOpSlot {
 	f := func(f *Frame, v, w *Object) (*Object, *BaseException) {
-		if w.isInstance(IntType) {
+		if i, ok := w.self.(*Int); ok {
+			w = intToLong(i).ToObject()
+		} else if w.isInstance(IntType) {
 			w = intToLong(toIntUnsafe(w)).ToObject()
 		} else if !w.isInstance(LongType) {
 			return NotImplemented, nil
@@ -503,7 +513,9 @@ func longShiftOpSlot(fun func(z, x *big.Int, n uint)) *binaryOpSlot {
 
 func longRShiftOpSlot(fun func(z, x *big.Int, n uint)) *binaryOpSlot {
 	f := func(f *Frame, v, w *Object) (*Object, *BaseException) {
-		if w.isInstance(IntType) {
+		if i, ok := w.self.(*Int); ok {
+			w = intToLong(i).ToObject()
+		} else if w.isInstance(IntType) {
 			w = intToLong(toIntUnsafe(w)).ToObject()
 		} else if !w.isInstance(LongType) {
 			return NotImplemented, nil
@@ -515,7 +527,9 @@ func longRShiftOpSlot(fun func(z, x *big.Int, n uint)) *binaryOpSlot {
 
 func longBinaryBoolOpSlot(fun func(x, y *big.Int) bool) *binaryOpSlot {
 	f := func(f *Frame, v, w *Object) (*Object, *BaseException) {
-		if w.isInstance(IntType) {
+		if i, ok := w.self.(*Int); ok {
+			w = intToLong(i).ToObject()
+		} else if w.isInstance(IntType) {
 			w = intToLong(toIntUnsafe(w)).ToObject()
 		} else if !w.isInstance(LongType) {
 			return NotImplemented, nil
@@ -527,7 +541,9 @@ func longBinaryBoolOpSlot(fun func(x, y *big.Int) bool) *binaryOpSlot {
 
 func longRBinaryBoolOpSlot(fun func(x, y *big.Int) bool) *binaryOpSlot {
 	f := func(f *Frame, v, w *Object) (*Object, *BaseException) {
-		if w.isInstance(IntType) {
+		if i, ok := w.self.(*Int); ok {
+			w = intToLong(i).ToObject()
+		} else if w.isInstance(IntType) {
 			w = intToLong(toIntUnsafe(w)).ToObject()
 		} else if !w.isInstance(LongType) {
 			return NotImplemented, nil
@@ -541,7 +557,11 @@ func longPow(f *Frame, v, w *Object) (*Object, *BaseException) {
 	var wLong *big.Int
 
 	vLong := toLongUnsafe(v).Value()
-	if w.isInstance(LongType) {
+	if l, ok := w.self.(*Long); ok {
+		wLong = l.Value()
+	} else if i, ok := w.self.(*Int); ok {
+		wLong = big.NewInt(int64(i.Value()))
+	} else if w.isInstance(LongType) {
 		wLong = toLongUnsafe(w).Value()
 	} else if w.isInstance(IntType) {
 		wLong = big.NewInt(int64(toIntUnsafe(w).Value()))
@@ -559,11 +579,13 @@ func longPow(f *Frame, v, w *Object) (*Object, *BaseException) {
 			return nil, raised
 		}
 		// w might be an int or a long
-		if w.isInstance(LongType) {
+		if _, ok := w.self.(*Long); ok || w.isInstance(LongType) {
 			wFloat, raised = longFloat(f, w)
 			if raised != nil {
 				return nil, raised
 			}
+		} else if i, ok := w.self.(*Int); ok {
+			wFloat = NewFloat(float64(i.Value())).ToObject()
 		} else if w.isInstance(IntType) {
 			wFloat = NewFloat(float64(toIntUnsafe(w).Value())).ToObject()
 		} else {
@@ -577,10 +599,10 @@ func longPow(f *Frame, v, w *Object) (*Object, *BaseException) {
 }
 
 func longRPow(f *Frame, v, w *Object) (*Object, *BaseException) {
-	if w.isInstance(LongType) {
+	if _, ok := w.self.(*Long); ok || w.isInstance(LongType) {
 		return longPow(f, w, v)
 	}
-	if w.isInstance(IntType) {
+	if _, ok := w.self.(*Int); ok || w.isInstance(IntType) {
 		wLong := NewLong(big.NewInt(int64(toIntUnsafe(w).Value()))).ToObject()
 		return longPow(f, wLong, v)
 	}
